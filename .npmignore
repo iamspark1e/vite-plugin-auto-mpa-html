@@ -1,0 +1,6 @@
+test
+.eslint*
+tsconfig.json
+vitest.config.ts
+*.ts
+*.tgz
