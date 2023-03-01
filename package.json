@@ -7,7 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint ./src --ext .ts"
+    "lint": "eslint ./src --ext .ts",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
+    "prepare": "husky install",
+    "postversion": "git push --follow-tags",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "vite-plugin",
@@ -20,13 +24,17 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
     "@types/ejs": "^3.1.2",
     "@types/node": "^18.14.2",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
+    "conventional-changelog-cli": "^2.2.2",
     "ejs": "^3.1.8",
     "eslint": "^8.35.0",
     "glob": "^9.0.1",
+    "husky": "^8.0.0",
     "prettier": "^2.8.4",
     "typescript": "^4.9.5",
     "vite": "^4.1.4"

@@ -4,3 +4,6 @@ tsconfig.json
 vitest.config.ts
 *.ts
 *.tgz
+.husky
+.huskyrc
+commitlint.config.js

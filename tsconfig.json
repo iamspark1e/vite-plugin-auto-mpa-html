@@ -102,6 +102,7 @@
   },
   "exclude": [
     "**/vitest.config.ts",
-    "**/lib/"
+    "**/lib/",
+    "commitlint.config.js"
   ]
 }
