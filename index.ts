@@ -17,7 +17,9 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         buildEnd: () => {
             cleanTempEntries(pluginOption || pluginDefaultOption, generatedMap)
         },
-        configureServer: (server) => devServerMiddleware(pluginOption || pluginDefaultOption, server),
+        configureServer: (server) => {
+            server.middlewares.use(devServerMiddleware(pluginOption || pluginDefaultOption))
+        },
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;
         },
@@ -27,9 +29,14 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                     rollupOptions: {
                         input: entries
                     },
+                },
+                resolve: {
+                    alias: {
+                        "VITE_PLUGIN_AUTO_MPA_HTML": ""
+                    }
                 }
             }
-        }
+        },
     }
 }
 
