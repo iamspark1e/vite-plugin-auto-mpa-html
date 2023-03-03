@@ -1,3 +1,16 @@
+## [0.0.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.1...v0.0.2) (2023-03-03)
+
+
+### Features
+
+* add an minimal projet for devServer tests ([5f6d2f3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/5f6d2f3e53790a786dde7d82a8467e9a2f8884c4))
+* add unit test for functions ([93c04b9](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/93c04b95ed3d0b57ee3a4c2371ceca9c360d86e5))
+* add unit test powered by Vitest, configureServer hook is still under testing ([a1d0077](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/a1d007743e9a545a762da768d7b073753b51d4fb))
+* add vitest test kit ([35817d4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/35817d435d139625b4a3af5824dfcf72e27eaaa3))
+* merge unit test into GitHub Action & npmignore ([6ea5366](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/6ea53664e8788a0f157349cc997c07ad4df7e218))
+
+
+
 ## [0.0.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.1-alpha.1...v0.0.1) (2023-03-01)
 
 
