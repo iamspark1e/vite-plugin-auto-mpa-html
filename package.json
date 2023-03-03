@@ -4,8 +4,7 @@
   "description": "A vite plugin for generating HTML entries automatically.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "vitest",
-    "coverage": "vitest run --coverage",
+    "test": "vitest run",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.test.ts\"",
     "lint": "eslint ./src --ext .ts",
