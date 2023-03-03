@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <meta name="description" content="<%= description %>" />
-    <meta name="keywords" content="<%= keywords %>" />
+    <title><%= (typeof title != 'undefined' ? title : '') %></title>
+    <meta name="description" content="<%= (typeof description != 'undefined' ? description : '') %>" />
+    <meta name="keywords" content="<%= (typeof keywords != 'undefined' ? keywords : '') %>" />
   </head>
   <body>
     <div id="app"></div>

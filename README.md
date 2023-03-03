@@ -109,3 +109,25 @@ I'm not familar with vite plugin development, so I've read some plugins' awesome
 - [vite-plugin-mpa-plus](https://github.com/yzydeveloper/vite-plugin-mpa-plus)
 - [vite-plugin-html-template-mpa](https://github.com/Miofly/vite-plugin-html-template-mpa)
 - [vite-plugin-virtual-mpa](https://github.com/emosheeep/vite-plugin-virtual-mpa)
+
+## Problems
+
+- Coverage cannot run.
+
+  Using `@vitest/coverage-c8`, shows `Cannot find package '@vitest/coverage-c8' imported from /my/code/path/to/vite-plugin-auto-mpa-html/node_modules/local-pkg/index.mjs`
+
+  > Report for now
+
+```
+% Coverage report from c8
+--------------------|---------|----------|---------|---------|-------------------
+File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+--------------------|---------|----------|---------|---------|-------------------
+All files           |   71.51 |    57.14 |   42.85 |   71.51 |                   
+ src                |   59.09 |       40 |   42.85 |   59.09 |                   
+  template.ts       |    87.5 |       50 |     100 |    87.5 | 15-16             
+  vite-lifecycle.ts |   54.25 |     37.5 |   33.33 |   54.25 | 15-50,53-59       
+ tests              |     100 |      100 |     100 |     100 |                   
+  server.test.ts    |     100 |      100 |     100 |     100 |                   
+--------------------|---------|----------|---------|---------|-------------------
+```
