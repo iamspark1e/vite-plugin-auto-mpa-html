@@ -3,10 +3,11 @@ import { describe, expect, it, vi, beforeEach, afterEach, beforeAll, afterAll } 
 import mock from 'mock-fs'
 import fs from 'node:fs'
 // Test functions
-import { prepareTempEntries, cleanTempEntries, devServerMiddleware } from '../src/vite-lifecycle.js'
+import { prepareTempEntries, cleanTempEntries } from '../src/vite-lifecycle.js'
 import { PluginOption } from '../src/types.js';
 import request from 'supertest'
 import connect from 'connect'
+import { createServer } from 'vite';
 
 const pluginOption: PluginOption = {
     sourceDir: "src",
@@ -35,7 +36,11 @@ const noTemplateDefinedProjectConstruct = {
     }
 }
 const commonProjectConstruct = {
-    "node_modules/vite-plugin-auto-mpa-html/assets/index.html": mock.load(path.resolve(__dirname, '..', 'assets/index.html')),
+    "node_modules": {
+        "vite-plugin-auto-mpa-html/assets/index.html": mock.load(path.resolve(__dirname, '..', 'assets/index.html')),
+        "vite": mock.load(path.resolve(__dirname, '..', 'node_modules/vite')),
+        "@esbuild": mock.load(path.resolve(__dirname, '..', 'node_modules/@esbuild')),
+    },
     "src": {
         "page1": {
             "assets": {
@@ -138,31 +143,3 @@ describe("Test plugin's lifecycle - buildEnd", () => {
         })
     })
 })
-
-// describe("Test plugin's lifecycle - devServer", async () => {
-//     const tmp = connect()
-//     beforeAll(async () => {
-//         mock(commonProjectConstruct)
-//     })
-
-//     // it("devMiddleware should not block non-HTML asset requests", async () => {
-//     //     // request `/src/page1/assets/index.css`
-//     //     tmp.use(devServerMiddleware(pluginOption))
-//     //     let res = await request(tmp).get("/src/page1/assets/index.css")
-//     //     expect(res.text).toBe(":root{background-color:#fff}")
-//     // })
-
-//     // it("devMiddleware should block HTML requests and replace with rendered", async () => {
-//     //     // request `/page2.html`
-//     //     console.log(fs.readFileSync('src/page1/assets/index.css', {encoding: "utf-8"}))
-//     //     tmp.use(devServerMiddleware(pluginOption))
-//     //     let res = await request(tmp).get("/page2.html")
-//     //     expect(res.text).toMatch("<title>templates/index.html</title>")
-//     //     expect(res.text).toMatch(`<script type="module" src="./${pluginOption.sourceDir}/page2/${pluginOption.entryName}"></script>`)
-//     // })
-
-//     afterAll(() => {
-//         mock.restore()
-//         vi.restoreAllMocks()
-//     })
-// })

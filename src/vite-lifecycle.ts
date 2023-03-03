@@ -64,7 +64,8 @@ export function devServerMiddleware(
     return async (req: Connect.IncomingMessage, res: ServerResponse<IncomingMessage>, next: Connect.NextFunction) => {
         const fileUrl = req.url || "";
         if (!fileUrl.endsWith(".html") && fileUrl !== "/") return next();
-        const configUrl = path.dirname(fileUrl) + "/" + pluginOption.configName;
+        const filename = path.basename(fileUrl).replace(".html", "")
+        const configUrl = pluginOption.sourceDir + '/' + filename + '/' + pluginOption.configName;
         // render as normal when no config file detected.
         if (!existsSync(configUrl)) return next();
         const temp = readFileSync(configUrl, { encoding: "utf-8" });
