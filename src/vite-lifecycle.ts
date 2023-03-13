@@ -10,7 +10,7 @@ import renderEjs from "./template.js";
 import type { Connect } from "vite";
 import type { PluginOption, PagePluginConfig } from "./types.js";
 import { IncomingMessage, ServerResponse } from "node:http";
-import getEntryKV from "./entry.js";
+import { genDirectory } from './helpers.js'
 
 export function prepareTempEntries(
   pluginOption: PluginOption,
@@ -63,17 +63,6 @@ export function cleanTempEntries(pluginOption: PluginOption, keys: string[]) {
   });
 }
 
-function generatePreviewEntryPage(pluginOption: PluginOption) {
-  let kvs = getEntryKV(pluginOption)
-  return `<div>
-    <ul>
-      ${Object.keys(kvs).map(kv => {
-        return `<li><a target="_blank" href="/${kv}.html">${kv}</a><li/>`
-      })}
-    </ul>
-  </div>`
-}
-
 export function devServerMiddleware(pluginOption: PluginOption) {
   return async (
     req: Connect.IncomingMessage,
@@ -82,8 +71,8 @@ export function devServerMiddleware(pluginOption: PluginOption) {
   ) => {
     const fileUrl = req.url || "";
     if (!fileUrl.endsWith(".html") && fileUrl !== "/") return next();
-    if(fileUrl.endsWith("index.html")) {
-      res.end(generatePreviewEntryPage(pluginOption));
+    if(pluginOption.enableDirectoryPage && fileUrl.endsWith("/")) {
+      res.end(genDirectory(pluginOption));
       return;
     }
     const filename = path.basename(fileUrl).replace(".html", "");

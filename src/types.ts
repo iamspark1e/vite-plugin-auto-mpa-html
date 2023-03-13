@@ -5,6 +5,7 @@ export type PluginOption = {
   sourceDir?: string; // scan entries under this dir
   ejsOption?: EjsOption; // see: https://github.com/mde/ejs#options
   sharedData?: object; // will be merged into every page's data
+  enableDirectoryPage?: boolean;
 };
 export const pluginDefaultOption: PluginOption = {
   configName: "config.js",
