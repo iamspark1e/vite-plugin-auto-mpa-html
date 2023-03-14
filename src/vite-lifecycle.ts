@@ -10,6 +10,7 @@ import renderEjs from "./template.js";
 import type { Connect } from "vite";
 import type { PluginOption, PagePluginConfig } from "./types.js";
 import { IncomingMessage, ServerResponse } from "node:http";
+import { genDirectory, isErrorOfNotFound } from './helpers.js'
 
 export function prepareTempEntries(
   pluginOption: PluginOption,
@@ -24,14 +25,24 @@ export function prepareTempEntries(
     if (existsSync(configPath)) {
       const tmp = readFileSync(configPath, { encoding: "utf-8" });
       pageData = JSON.parse(tmp);
+    } else {
+      throw new Error(`Page entry: ${pluginOption.sourceDir}/${k}, its config (${pluginOption.configName}) cannot be found, please check!`)
     }
-    let htmlContent = readFileSync(
-      pageData.template ||
+    let htmlContent: string;
+    try {
+      htmlContent = readFileSync(
+        pageData.template ||
         "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
-      {
-        encoding: "utf-8",
+        {
+          encoding: "utf-8",
+        }
+      );
+    } catch (e) {
+      if (isErrorOfNotFound(e)) {
+        e.message = `Page entry: ${pluginOption.sourceDir}/${k}, its template (${pageData.template}) cannot be found, please check! (${e.message})`
       }
-    );
+      throw e;
+    }
     htmlContent = renderEjs(
       htmlContent,
       {
@@ -54,6 +65,8 @@ export function prepareTempEntries(
 }
 
 export function cleanTempEntries(pluginOption: PluginOption, keys: string[]) {
+  // `buildEnd` will be called even build failed, so a throttle is needed.
+  if (!keys || keys.length === 0) return;
   keys.forEach((k) => {
     // generate temp entries for build
     // FIXME: nested folders?
@@ -70,6 +83,10 @@ export function devServerMiddleware(pluginOption: PluginOption) {
   ) => {
     const fileUrl = req.url || "";
     if (!fileUrl.endsWith(".html") && fileUrl !== "/") return next();
+    if (pluginOption.enableDirectoryPage && fileUrl.endsWith("/")) {
+      res.end(genDirectory(pluginOption));
+      return;
+    }
     const filename = path.basename(fileUrl).replace(".html", "");
     const configUrl =
       pluginOption.sourceDir + "/" + filename + "/" + pluginOption.configName;
@@ -79,7 +96,7 @@ export function devServerMiddleware(pluginOption: PluginOption) {
     const pageConfig: PagePluginConfig = JSON.parse(temp);
     let htmlContent = readFileSync(
       pageConfig.template ||
-        "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
+      "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
       {
         encoding: "utf-8",
       }

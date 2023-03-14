@@ -22,7 +22,8 @@ export default defineConfig({
     configName: "config.json",
     entryName: "main.tsx",
     sharedData: {},
-    sourceDir: "src"
+    sourceDir: "src",
+    enableDirectoryPage: true, // enable directory page will render an directory page at "http://localhost:5173/", if you have an index, it will not be affect.
   })],
 })
 
