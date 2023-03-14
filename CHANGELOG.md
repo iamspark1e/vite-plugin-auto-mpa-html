@@ -1,3 +1,13 @@
+## [0.0.6](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.5...v0.0.6) (2023-03-14)
+
+
+### Bug Fixes
+
+* add entries detection in case plugin option is incorrect ([0dbded8](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/0dbded8099e6804b95a40ae8bafffc04384c17f4))
+* npm package miss .d.ts file ([edfbc02](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/edfbc0297ef4146171911b101900ea2dce7f44a0))
+
+
+
 ## [0.0.5](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.4...v0.0.5) (2023-03-14)
 
 
