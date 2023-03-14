@@ -4,6 +4,17 @@
 ### Bug Fixes
 
 * add entries detection in case plugin option is incorrect ([0dbded8](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/0dbded8099e6804b95a40ae8bafffc04384c17f4))
+* inject rollup option now use console.error instead of directly throw error for unit tests ([f441600](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/f4416009fb6d701f7394191ecd15828809d5f773))
+* npm package miss .d.ts file ([edfbc02](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/edfbc0297ef4146171911b101900ea2dce7f44a0))
+
+
+
+## [0.0.6](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.5...v0.0.6) (2023-03-14)
+
+
+### Bug Fixes
+
+* add entries detection in case plugin option is incorrect ([0dbded8](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/0dbded8099e6804b95a40ae8bafffc04384c17f4))
 * npm package miss .d.ts file ([edfbc02](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/edfbc0297ef4146171911b101900ea2dce7f44a0))
 
 
