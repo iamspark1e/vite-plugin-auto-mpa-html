@@ -2,6 +2,7 @@
 tsconfig.json
 vitest.config.js
 *.ts
+!*.d.ts
 *.tgz
 .husky
 .huskyrc
