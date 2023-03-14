@@ -1,3 +1,12 @@
+## [0.0.5](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.4...v0.0.5) (2023-03-14)
+
+
+### Bug Fixes
+
+* glob package should in deps not devDeps, update docs & ignore file ([b015a86](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/b015a86bfb802ca298596943668a7b4c7f322cc5))
+
+
+
 ## [0.0.4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.3...v0.0.4) (2023-03-14)
 
 
