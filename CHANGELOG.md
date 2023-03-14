@@ -1,3 +1,12 @@
+## [0.0.4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.3...v0.0.4) (2023-03-14)
+
+
+### Bug Fixes
+
+* package glob import `globSync` error ([726d67a](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/726d67a3b6814a1ded61cb7d73a719a54a938df5))
+
+
+
 ## [0.0.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.2...v0.0.3) (2023-03-14)
 
 
