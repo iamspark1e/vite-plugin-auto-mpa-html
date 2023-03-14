@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.test.ts\"",
     "lint": "eslint ./src --ext .ts",
@@ -23,6 +24,10 @@
     "url": "https://github.com/iamspark1e/vite-plugin-auto-mpa-html.git"
   },
   "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "glob": "^9.0.1"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
     "@commitlint/config-conventional": "^17.4.4",
@@ -37,9 +42,7 @@
     "@vitest/coverage-c8": "^0.29.2",
     "connect": "^3.7.0",
     "conventional-changelog-cli": "^2.2.2",
-    "ejs": "^3.1.8",
     "eslint": "^8.35.0",
-    "glob": "^9.0.1",
     "husky": "^8.0.0",
     "local-pkg": "^0.4.2",
     "memfs": "^3.4.13",

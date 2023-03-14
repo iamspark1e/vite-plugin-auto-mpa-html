@@ -1,7 +1,6 @@
-test
 .eslint*
 tsconfig.json
-vitest.config.ts
+vitest.config.js
 *.ts
 *.tgz
 .husky
@@ -9,3 +8,4 @@ vitest.config.ts
 commitlint.config.js
 .github
 tests
+coverage
