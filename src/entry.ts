@@ -1,4 +1,5 @@
-import { globSync } from "glob";
+import pkg from 'glob';
+const { globSync } = pkg;
 import path from "node:path";
 import type { PluginOption } from "./types.js";
 
