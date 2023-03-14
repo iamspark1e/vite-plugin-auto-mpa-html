@@ -1,3 +1,18 @@
+## [0.0.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.2...v0.0.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* `buildStart` error overrided by `buildEnd` errors \n fix: add console warning if entry file is not configured properly\n feat: add directory page if `enableDirectoryPage` is set `true` ([a2ae7d4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/a2ae7d491e64762581a7e2be7d6e6b4533083899))
+
+
+### Features
+
+* add devServer Directory page ([bfde57d](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/bfde57d479c831ec339709e350f051874b941686))
+* auto generate mpa entry ([4ea1d53](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/4ea1d535495f1380238a410285c06a5bbc90413d))
+
+
+
 ## [0.0.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.1...v0.0.2) (2023-03-03)
 
 
