@@ -24,7 +24,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             config = resolvedConfig;
         },
         config: () => {
-            if(!entries || Object.keys(entries).length === 0) throw new Error("[vite-plugin-auto-mpa-html] Error: 0 entry detected! Please check your plugin's option (entryName) in Vite config file.")
+            if(!entries || Object.keys(entries).length === 0) console.error("[vite-plugin-auto-mpa-html] Error: 0 entry detected! Please check your plugin's option (entryName) in Vite config file.")
             return {
                 build: {
                     rollupOptions: {
