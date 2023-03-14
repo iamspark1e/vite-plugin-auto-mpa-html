@@ -17,6 +17,9 @@ function getEntry(pluginOption: PluginOption): string[] {
         .replace(pluginOption.sourceDir + "/", "")
     );
   }
+  if(entries.length === 0) {
+    console.error("[vite-plugin-auto-mpa-html] Error: 0 entry detected! Please check your plugin's option in Vite config file.")
+  }
   return entries;
 }
 export default function getEntryKV(pluginOption: PluginOption): {

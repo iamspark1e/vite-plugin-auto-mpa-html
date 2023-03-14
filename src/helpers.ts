@@ -1,4 +1,4 @@
-import getEntryKV from "./entry"
+import getEntryKV from "./entry.js"
 import { readFileSync } from 'node:fs'
 import type { PluginOption } from "./types"
 
@@ -32,7 +32,7 @@ export function genDirectory(pluginOption: PluginOption) {
   </head>
   <body>
     <div>
-      <h1>Directory:</h1>
+      <h1 style="font-size:20px;">Directory:</h1>
       <ul>
         ${Object.keys(entriesWithConfig).map(kv => {
     return `<li><a target="_blank" href="/${kv}.html" title="${pluginOption.sourceDir}/${kv}/">${entriesWithConfig[kv].config.title || ""}</a></li>`
@@ -41,4 +41,20 @@ export function genDirectory(pluginOption: PluginOption) {
     </div>
   </body>
   </html>`
+}
+
+type ErrorOfNotFound = {
+  code: string;
+  message: string;
+}
+
+export function isErrorOfNotFound(error: unknown): error is ErrorOfNotFound {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    'message' in error &&
+    typeof (error as Record<string,unknown>).code === 'string' &&
+    typeof (error as Record<string,unknown>).message === 'string'
+  )
 }
