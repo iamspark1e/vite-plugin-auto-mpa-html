@@ -17,6 +17,12 @@ jobs:
       - run: npm run build
       - name: Auto Test
         run: npm run test
+      - name: Coverage
+        run: npm run coverage
+      - name: Jest Coverage Comment
+        uses: MishaKav/jest-coverage-comment@main
+        with:
+          coverage-summary-path: ./coverage/coverage-summary.json
       - name: Create Release and Upload Release Asset
         run: npm i -g github-release-from-changelog && github-release-from-changelog
         env:
