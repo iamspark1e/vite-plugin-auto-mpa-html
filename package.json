@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-auto-mpa-html",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A vite plugin for generating HTML entries automatically.",
   "main": "lib/index.js",
   "scripts": {

@@ -1,3 +1,20 @@
+## [0.0.8](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.7...v0.0.8) (2023-03-22)
+
+
+### Bug Fixes
+
+* entry test drop need of `mock-fs` ([7f2bf0f](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/7f2bf0ff20e73abf7a3dd789758e41668fe8c9a2))
+* remove assets/index.html, use hardcode ([e7ae589](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/e7ae5896ecfbf265de34596cb96d4d91ed402025))
+* remove mock-fs usage ([516f13a](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/516f13a6ff22c73c0ad6741b5928f17da6f68dec))
+
+
+### Features
+
+* add coverage comment when publish ([5b6efa3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/5b6efa3605a4ae0121b9bb689b30a536f813d759))
+* add vite native feature tests ([a6ca0c3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/a6ca0c3a5ee08227e15f9ce21c980d301211f9c5))
+
+
+
 ## [0.0.7](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.6...v0.0.7) (2023-03-14)
 
 
