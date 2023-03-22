@@ -30,14 +30,16 @@ export function prepareTempEntries(
     }
     let htmlContent: string;
     try {
+      console.log(__dirname)
       htmlContent = readFileSync(
         pageData.template ||
-        "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
+        path.resolve(__dirname, "..", "assets", "index.html"),
         {
           encoding: "utf-8",
         }
       );
     } catch (e) {
+      console.log(e)
       if (isErrorOfNotFound(e)) {
         e.message = `Page entry: ${pluginOption.sourceDir}/${k}, its template (${pageData.template}) cannot be found, please check! (${e.message})`
       }
@@ -96,7 +98,7 @@ export function devServerMiddleware(pluginOption: PluginOption) {
     const pageConfig: PagePluginConfig = JSON.parse(temp);
     let htmlContent = readFileSync(
       pageConfig.template ||
-      "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
+      path.resolve(__dirname, "assets", "index.html"),
       {
         encoding: "utf-8",
       }

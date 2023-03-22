@@ -1,5 +1,5 @@
 // This test is designed for Vite native features, related to HTML replacement.
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, expectTypeOf } from "vitest";
 import react from '@vitejs/plugin-react'
 import autoMpaHTMLPlugin from '../index.js'
 import { build } from "vite";

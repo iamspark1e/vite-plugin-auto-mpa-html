@@ -14,8 +14,8 @@ const pluginOption: PluginOption = {
 describe("Test base function - getEntryKV", () => {
   it("should count entries correctly", () => {
     const data = getEntryKV(pluginOption);
-    expect(path.relative(__dirname, data["page1"])).toBe("../page1.html"); // generated to root dir
-    expect(path.relative(__dirname, data["page2"])).toBe("../page2.html");
+    expect(path.relative(__dirname, data["normal"])).toBe("../normal.html"); // generated to root dir
+    expect(path.relative(__dirname, data["no-template"])).toBe("../no-template.html");
     expect(Object.keys(data).length).toBe(3);
   });
 });

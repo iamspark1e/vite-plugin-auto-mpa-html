@@ -31,12 +31,12 @@ describe("Test plugin's lifecycle - devServer", async () => {
     tmp.use(viteServer.middlewares);
     tmp.use(devServerMiddleware(pluginOption));
 
-    let res = await request(tmp).get("/src/page1/assets/index.css");
+    let res = await request(tmp).get("/src/normal/assets/index.css");
     expect(res.text).toMatch(":root{background-color:#fff}");
-    res = await request(tmp).get("/page2.html");
+    res = await request(tmp).get("/normal.html");
     expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
     expect(res.text).toMatch(
-      `<script type="module" src="./${pluginOption.sourceDir}/page2/${pluginOption.entryName}"></script>`
+      `<script type="module" src="./${pluginOption.sourceDir}/normal/${pluginOption.entryName}"></script>`
     );
   });
 
