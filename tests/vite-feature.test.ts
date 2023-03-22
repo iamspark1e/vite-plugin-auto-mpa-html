@@ -3,7 +3,6 @@ import { describe, it, expect } from "vitest";
 import react from '@vitejs/plugin-react'
 import autoMpaHTMLPlugin from '../index.js'
 import { build } from "vite";
-import type { RollupOutput } from 'rollup'
 
 // v4.2.0 HTML Env Replacement
 describe("Vite native features", () => {
