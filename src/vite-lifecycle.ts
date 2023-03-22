@@ -12,6 +12,21 @@ import type { PluginOption, PagePluginConfig } from "./types.js";
 import { IncomingMessage, ServerResponse } from "node:http";
 import { genDirectory, isErrorOfNotFound } from './helpers.js'
 
+const __defaultHTMLTemplate = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= (typeof title != 'undefined' ? title : '') %></title>
+    <meta name="description" content="<%= (typeof description != 'undefined' ? description : '') %>" />
+    <meta name="keywords" content="<%= (typeof keywords != 'undefined' ? keywords : '') %>" />
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>`
+
 export function prepareTempEntries(
   pluginOption: PluginOption,
   dest: string,
@@ -30,18 +45,18 @@ export function prepareTempEntries(
     }
     let htmlContent: string;
     try {
-      htmlContent = readFileSync(
-        pageData.template ||
-        "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
+      htmlContent = readFileSync(pageData.template || '',
         {
           encoding: "utf-8",
         }
       );
     } catch (e) {
       if (isErrorOfNotFound(e)) {
-        e.message = `Page entry: ${pluginOption.sourceDir}/${k}, its template (${pageData.template}) cannot be found, please check! (${e.message})`
+        console.error(`Page entry: ${pluginOption.sourceDir}/${k}, its template (${pageData.template}) cannot be found, using default template as fallback! (${e.message})`)
+        htmlContent = __defaultHTMLTemplate
+      } else {
+        throw e
       }
-      throw e;
     }
     htmlContent = renderEjs(
       htmlContent,
@@ -94,13 +109,22 @@ export function devServerMiddleware(pluginOption: PluginOption) {
     if (!existsSync(configUrl)) return next();
     const temp = readFileSync(configUrl, { encoding: "utf-8" });
     const pageConfig: PagePluginConfig = JSON.parse(temp);
-    let htmlContent = readFileSync(
-      pageConfig.template ||
-      "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
-      {
-        encoding: "utf-8",
+    let htmlContent;
+    try {
+      htmlContent = readFileSync(
+        pageConfig.template || "",
+        {
+          encoding: "utf-8",
+        }
+      );
+    } catch (e) {
+      if (isErrorOfNotFound(e)) {
+        console.error(`Page entry: ${pluginOption.sourceDir}/${filename}, its template cannot be found, using default template as fallback! (${e.message})`)
+        htmlContent = __defaultHTMLTemplate
+      } else {
+        throw e
       }
-    );
+    }
     htmlContent = renderEjs(
       htmlContent,
       {

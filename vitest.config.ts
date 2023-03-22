@@ -4,9 +4,8 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     coverage: {
       provider: "c8",
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text-summary', 'json-summary'],
       exclude: [
-        'node_modules/**/*',
         'tests/example/**/*'
       ],
     }
