@@ -6,17 +6,12 @@ import {
   vi,
   beforeEach,
   afterEach,
-  beforeAll,
-  afterAll,
 } from "vitest";
 import mock from "mock-fs";
 import fs from "node:fs";
 // Test functions
 import { prepareTempEntries, cleanTempEntries } from "../src/vite-lifecycle.js";
 import { PluginOption } from "../src/types.js";
-import request from "supertest";
-import connect from "connect";
-import { createServer } from "vite";
 
 const pluginOption: PluginOption = {
   sourceDir: "src",
@@ -32,6 +27,9 @@ const entriesKV = {
   page2: "",
 };
 const noTemplateDefinedProjectConstruct = {
+  "node_modules": mock.load(
+    path.resolve(__dirname, '..', "node_modules")
+  ),
   "node_modules/vite-plugin-auto-mpa-html/assets/index.html": mock.load(
     path.resolve(__dirname, "..", "assets/index.html")
   ),
@@ -47,15 +45,12 @@ const noTemplateDefinedProjectConstruct = {
   },
 };
 const commonProjectConstruct = {
-  node_modules: {
-    "vite-plugin-auto-mpa-html/assets/index.html": mock.load(
-      path.resolve(__dirname, "..", "assets/index.html")
-    ),
-    vite: mock.load(path.resolve(__dirname, "..", "node_modules/vite")),
-    "@esbuild": mock.load(
-      path.resolve(__dirname, "..", "node_modules/@esbuild")
-    ),
-  },
+  "node_modules": mock.load(
+    path.resolve(__dirname, '..', "node_modules")
+  ),
+  "node_modules/vite-plugin-auto-mpa-html/assets/index.html": mock.load(
+    path.resolve(__dirname, "..", "assets/index.html")
+  ),
   src: {
     page1: {
       assets: {

@@ -12,6 +12,9 @@ const pluginOption: PluginOption = {
   ejsOption: {},
 };
 const commonProjectConstruct = {
+  "node_modules": mock.load(
+    path.resolve(__dirname, '..', "node_modules")
+  ),
   "node_modules/vite-plugin-auto-mpa-html/assets/index.html": mock.load(
     path.resolve(__dirname, "..", "assets/index.html")
   ),
