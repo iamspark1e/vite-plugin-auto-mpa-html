@@ -88,7 +88,11 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
 
 ## Limitation
 
-- [ ] Nested folder is __NOT SUPPORTED__ for now.
+- Nested folder is __NOT SUPPORTED__. Your entries should just be placed under your `scanDir` folder. Deeper entries will not be scanned. (Due to duplicate reasons)
+
+## Vite native features
+
+- [x] v4.2+ HTML Env Replacement
 
 ## Build Setup
 
@@ -110,27 +114,3 @@ I'm not familar with vite plugin development, so I've read some plugins' awesome
 - [vite-plugin-mpa-plus](https://github.com/yzydeveloper/vite-plugin-mpa-plus)
 - [vite-plugin-html-template-mpa](https://github.com/Miofly/vite-plugin-html-template-mpa)
 - [vite-plugin-virtual-mpa](https://github.com/emosheeep/vite-plugin-virtual-mpa)
-
-## Problems
-
-- Coverage cannot run.
-
-  Using `@vitest/coverage-c8`, shows `Cannot find package '@vitest/coverage-c8' imported from /my/code/path/to/vite-plugin-auto-mpa-html/node_modules/local-pkg/index.mjs`
-
-  > Report for now
-
-```
-% Coverage report from c8
---------------------|---------|----------|---------|---------|----------------------
-File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s    
---------------------|---------|----------|---------|---------|----------------------
-All files           |   48.92 |       50 |   23.07 |   48.92 |                      
- src                |   37.82 |    33.33 |   23.07 |   37.82 |                      
-  entry.ts          |   14.28 |      100 |       0 |   14.28 | 6-35                 
-  helpers.ts        |      20 |      100 |       0 |      20 | 6-44,52-60           
-  template.ts       |    87.5 |       50 |     100 |    87.5 | 15-16                
-  vite-lifecycle.ts |   47.05 |       30 |   33.33 |   47.05 | 16-65,68-76,87-89,99 
- tests              |     100 |      100 |     100 |     100 |                      
-  server.test.ts    |     100 |      100 |     100 |     100 |                      
---------------------|---------|----------|---------|---------|----------------------
-```
