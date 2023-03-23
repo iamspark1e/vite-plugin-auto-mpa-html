@@ -1,5 +1,13 @@
 <h1 align='center'>vite-plugin-auto-mpa-html</h1>
 
+<p align='center'>
+  <a href="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html" > 
+    <img src="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html/branch/main/graph/badge.svg?token=xW4J4R4P7b"/> 
+  </a>
+  <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/v/vite-plugin-auto-mpa-html" /></a>
+  <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/dm/vite-plugin-auto-mpa-html" /></a>
+</p>
+
 <p align='center'>An out-of-box solution for MPA application built with Vite.</p>
 <br />
 
