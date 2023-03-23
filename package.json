@@ -33,7 +33,6 @@
     "@commitlint/config-conventional": "^17.4.4",
     "@types/connect": "^3.4.35",
     "@types/ejs": "^3.1.2",
-    "@types/mock-fs": "^4.13.1",
     "@types/node": "^18.15.5",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
