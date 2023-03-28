@@ -96,7 +96,9 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
 
 ## Limitation
 
-- Nested folder is __NOT SUPPORTED__. Your entries should just be placed under your `scanDir` folder. Deeper entries will not be scanned. (Due to duplicate reasons)
+- Nested folder is __NOT SUPPORTED__. Your entries should just be placed under your `scanDir` folder. Deeper files which is named as `entryName` will not be treated as entry file. (Because we copied every entry's template to the root folder for production build. Support nested folder may cause unpredictable error.)
+
+- Env files is only supported in root folder (same level as `vite.config.js`), env-per-entry is __NOT SUPPORTED__.
 
 ## Vite native features
 
