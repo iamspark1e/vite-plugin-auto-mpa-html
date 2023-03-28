@@ -18,9 +18,7 @@ const pluginOption: PluginOption = {
 // A: `mock-fs` doesn't support socket file (mock-fs issue #370: https://github.com/tschaub/mock-fs/issues/370#issuecomment-1360398123)
 describe("Test plugin's lifecycle - devServer", async () => {
   const tmp = connect();
-  beforeAll(() => {});
-
-  it("devMiddleware should block HTML requests and replace with rendered", async () => {
+  beforeAll(async () => {
     let viteServer = await createServer({
       root: path.resolve(__dirname, "fixtures"),
       server: {
@@ -30,7 +28,9 @@ describe("Test plugin's lifecycle - devServer", async () => {
     });
     tmp.use(viteServer.middlewares);
     tmp.use(devServerMiddleware(pluginOption));
+  });
 
+  it("devMiddleware should block HTML requests and replace with rendered", async () => {
     let res = await request(tmp).get("/src/normal/assets/index.css");
     expect(res.text).toMatch(":root{background-color:#fff}");
     res = await request(tmp).get("/normal.html");
@@ -38,6 +38,11 @@ describe("Test plugin's lifecycle - devServer", async () => {
     expect(res.text).toMatch(
       `<script type="module" src="./${pluginOption.sourceDir}/normal/${pluginOption.entryName}"></script>`
     );
+  });
+
+  it("devMiddleware should not block html if exist in public folder", async () => {
+    let res = await request(tmp).get("/should-keep.html");
+    expect(res.text).toMatch("<body><h1>Should be kept</h1></body>");
   });
 
   afterAll(() => {
