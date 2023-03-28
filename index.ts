@@ -30,11 +30,6 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                     rollupOptions: {
                         input: entries
                     },
-                },
-                resolve: {
-                    alias: {
-                        "VITE_PLUGIN_AUTO_MPA_HTML": ""
-                    }
                 }
             }
         },
