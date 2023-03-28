@@ -1,3 +1,13 @@
+## [0.0.9](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.9-alpha.0...v0.0.9) (2023-03-28)
+
+
+### Bug Fixes
+
+* remove @types/mock-fs ([3835b19](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/3835b195db8370fa8dd5b8ed345a21afcd6aaf50))
+* remove unused resolve definition ([c0155f7](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/c0155f756b43b17781d78c525f1f18a3166b4064))
+
+
+
 ## [0.0.9-alpha.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.8...v0.0.9-alpha.0) (2023-03-23)
 
 
