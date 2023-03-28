@@ -18,4 +18,9 @@ describe("Test base function - getEntryKV", () => {
     expect(path.relative(__dirname, data["no-template"])).toBe("../no-template.html");
     expect(Object.keys(data).length).toBe(3);
   });
+
+  it("nested folder should NOT be captured", () => {
+    const data = getEntryKV(pluginOption);
+    expect(Object.keys(data).includes("normal/nested")).toBe(false);
+  });
 });
