@@ -1,3 +1,12 @@
+# [0.1.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.9...v0.1.0) (2023-04-12)
+
+
+### Bug Fixes
+
+* add `viteServer.transformIndexHtml` for devServerMiddleware, fix cannot detect preamble bug ([54b4691](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/54b4691eff66864631339cab1152b75b3cb86a9d))
+
+
+
 ## [0.0.9](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.9-alpha.0...v0.0.9) (2023-03-28)
 
 
