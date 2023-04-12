@@ -27,7 +27,7 @@ describe("Test plugin's lifecycle - devServer", async () => {
       appType: "custom",
     });
     tmp.use(viteServer.middlewares);
-    tmp.use(devServerMiddleware(pluginOption));
+    tmp.use(devServerMiddleware(pluginOption, viteServer));
   });
 
   it("devMiddleware should block HTML requests and replace with rendered", async () => {

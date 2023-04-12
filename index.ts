@@ -18,7 +18,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             cleanTempEntries(pluginOption || pluginDefaultOption, generatedMap)
         },
         configureServer: (server) => {
-            server.middlewares.use(devServerMiddleware(pluginOption || pluginDefaultOption))
+            server.middlewares.use(devServerMiddleware(pluginOption || pluginDefaultOption, server))
         },
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;

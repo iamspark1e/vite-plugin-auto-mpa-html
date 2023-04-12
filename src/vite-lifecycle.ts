@@ -7,6 +7,7 @@ import {
 } from "node:fs";
 import path from "node:path";
 import renderEjs from "./template.js";
+import { ViteDevServer } from 'vite'
 import type { Connect } from "vite";
 import type { PluginOption, PagePluginConfig } from "./types.js";
 import { IncomingMessage, ServerResponse } from "node:http";
@@ -90,7 +91,7 @@ export function cleanTempEntries(pluginOption: PluginOption, keys: string[]) {
   });
 }
 
-export function devServerMiddleware(pluginOption: PluginOption) {
+export function devServerMiddleware(pluginOption: PluginOption, server: ViteDevServer) {
   return async (
     req: Connect.IncomingMessage,
     res: ServerResponse<IncomingMessage>,
@@ -134,10 +135,11 @@ export function devServerMiddleware(pluginOption: PluginOption) {
       pluginOption.ejsOption
     );
     const folderName = path.basename(fileUrl).replace(".html", "");
-    const generatedHtml = htmlContent.replace(
+    let generatedHtml = htmlContent.replace(
       "</html>",
       `<script type="module" src="./${pluginOption.sourceDir}/${folderName}/${pluginOption.entryName}"></script></html>`
     );
+    generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
     res.end(generatedHtml);
   };
 }
