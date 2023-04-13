@@ -1,3 +1,12 @@
+## [0.1.1-alpha.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.1.0...v0.1.1-alpha.0) (2023-04-13)
+
+
+### Features
+
+* add helper unit test, add fallback href text for no-title pages ([35064cf](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/35064cf252f3c4fadea255671bde28ae3ba53a63))
+
+
+
 # [0.1.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.0.9...v0.1.0) (2023-04-12)
 
 
