@@ -35,7 +35,7 @@ export function genDirectory(pluginOption: PluginOption) {
       <h1 style="font-size:20px;">Directory:</h1>
       <ul>
         ${Object.keys(entriesWithConfig).map(kv => {
-    return `<li><a target="_blank" href="/${kv}.html" title="${pluginOption.sourceDir}/${kv}/">${entriesWithConfig[kv].config.title || ""}</a></li>`
+    return `<li><a target="_blank" href="/${kv}.html">${entriesWithConfig[kv].config.title || `${pluginOption.sourceDir}/${kv}`}</a></li>`
   }).join("")}
       </ul>
     </div>
