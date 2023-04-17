@@ -15,9 +15,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
-      - name: Auto Test
-        run: npm run test
-      - name: Coverage
+      - name: Auto Test with Coverage
         run: npm run coverage
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3
