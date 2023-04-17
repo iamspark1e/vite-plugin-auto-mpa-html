@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import autoMpaHTMLPlugin from '../../lib/index'
+import autoMpaHTMLPlugin from '../../dist/index'
 
 // https://vitejs.dev/config/
 export default defineConfig({
