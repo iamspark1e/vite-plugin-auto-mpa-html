@@ -2,11 +2,20 @@
   "name": "vite-plugin-auto-mpa-html",
   "version": "0.1.1-alpha.0",
   "description": "A vite plugin for generating HTML entries automatically.",
-  "main": "lib/index.js",
+  "main": "./lib/index.js",
+  "module": "./lib/index.mjs",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./lib/index.cjs",
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
   "scripts": {
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "build": "tsc",
+    "build": "tsup index.ts --format cjs,esm --dts --clean",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.test.ts\"",
     "lint": "eslint ./src --ext .ts",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
@@ -47,6 +56,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "supertest": "^6.3.3",
+    "tsup": "^6.7.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.1",
     "vitest": "^0.29.7"
