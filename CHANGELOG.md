@@ -5,6 +5,18 @@
 
 * add multi version export ([2da968f](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/2da968f01ed2080be8c7f6a2bb1d35d65d2bf84f))
 * change output dir to adapt `tsup` default config ([aff67c4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/aff67c48cb656739826abec3cef7b7703902e090))
+* revert version in package.json ([c06bfdf](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/c06bfdf151e2072fd07cc3a2bcb607b3ba65ebd8))
+* using bundled plugin in tests change its path ([773d163](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/773d16362149ccffb7b81bc41aab7d43b538fefc))
+
+
+
+## [0.1.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.1.1-alpha.0...v0.1.1) (2023-04-17)
+
+
+### Bug Fixes
+
+* add multi version export ([2da968f](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/2da968f01ed2080be8c7f6a2bb1d35d65d2bf84f))
+* change output dir to adapt `tsup` default config ([aff67c4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/aff67c48cb656739826abec3cef7b7703902e090))
 
 
 
