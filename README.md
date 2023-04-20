@@ -8,7 +8,7 @@
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/dm/vite-plugin-auto-mpa-html" /></a>
 </p>
 
-<p align='center'>An out-of-box solution for MPA application built with Vite.</p>
+<p align='center'>A file directory-based automated multi-page Vite plugin that supports HTML templates using EJS.</p>
 <br />
 
 ## Quick Start
