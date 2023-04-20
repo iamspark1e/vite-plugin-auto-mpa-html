@@ -2,13 +2,11 @@ import request from "supertest";
 import connect from "connect";
 import { createServer } from "vite";
 import { describe, expect, it, vi, beforeAll, afterAll } from "vitest";
-import { devServerMiddleware } from "../src/vite-lifecycle.js";
+import { devServerMiddleware } from "../src/dev-middleware.js";
 import type { PluginOption } from "../src/types.js";
 import path from "path";
 
 const pluginOption: PluginOption = {
-  sourceDir: "tests/fixtures/src",
-  configName: "config.json",
   entryName: "main.jsx",
   sharedData: {},
   ejsOption: {},

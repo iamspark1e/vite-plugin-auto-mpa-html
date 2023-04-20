@@ -1,28 +1,42 @@
 import type { Options as EjsOption } from "ejs";
+
 export type PluginOption = {
-  configName?: string; // config.js / config.json
-  entryName?: string; // main.(js/ts) / index.(js/ts)
-  sourceDir?: string; // scan entries under this dir
-  ejsOption?: EjsOption; // see: https://github.com/mde/ejs#options
-  sharedData?: object; // will be merged into every page's data
-  enableDirectoryPage?: boolean;
-};
-export const pluginDefaultOption: PluginOption = {
-  configName: "config.js",
-  entryName: "main.js",
-  sourceDir: "src",
-};
+    entryName?: string;                 // default:main.js
+    ejsOption?: EjsOption;
+    sharedData?: object;                // will be merged into every page's data
+    enableDevDirectory?: boolean;
+}
+
+export type MergedPluginOption = {
+    entryName: string;                 // default:main.js
+    ejsOption?: EjsOption;
+    sharedData?: object;                // will be merged into every page's data
+    enableDevDirectory: boolean;
+}
+
+export const defaultPluginOption = {
+    entryName: "main.js",
+    enableDevDirectory: true
+}
 
 export type PagePluginConfig = {
-  template?: string;
-  serverInjectMarkup?: string;
-  data?: object;
+    template?: string;
+    serverInjectMarkup?: string;
+    data?: object;
 };
-export const pagePluginDefaultConfig = {
-  template: "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
-  data: {
-    title: "",
-    description: "",
-    keywords: "",
-  },
-};
+
+type ErrorOfNotFound = {
+    code: string;
+    message: string;
+}
+
+export function isErrorOfNotFound(error: unknown): error is ErrorOfNotFound {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        'message' in error &&
+        typeof (error as Record<string, unknown>).code === 'string' &&
+        typeof (error as Record<string, unknown>).message === 'string'
+    )
+}

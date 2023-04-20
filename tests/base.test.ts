@@ -9,12 +9,10 @@ import {
 } from "vitest";
 import fs from "node:fs";
 // Test functions
-import { prepareTempEntries, cleanTempEntries } from "../src/vite-lifecycle.js";
+import { prepareTempEntries, cleanTempEntries } from "../src/template.js";
 import { PluginOption } from "../src/types.js";
 
 const pluginOption: PluginOption = {
-  sourceDir: "tests/fixtures/src",
-  configName: "config.json",
   entryName: "main.jsx",
   sharedData: {},
   ejsOption: {},

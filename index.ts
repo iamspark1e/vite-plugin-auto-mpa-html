@@ -1,34 +1,50 @@
-import getEntryKV from './src/entry.js'
-import { prepareTempEntries, cleanTempEntries, devServerMiddleware } from './src/vite-lifecycle.js'
-import { pluginDefaultOption } from './src/types.js'
-import type { Plugin, ResolvedConfig } from 'vite'
+import path from 'path'
+import { devServerMiddleware } from './src/dev-middleware.js'
+import { getEntries, getBuildRequiredComponents } from './src/core.js'
+import { defaultPluginOption } from './src/types.js'
+import { cleanTempEntries, prepareTempEntries } from './src/template.js'
+import type { Entries, EntriesWithComponent } from './src/core.js'
 import type { PluginOption } from './src/types.js'
+import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
 
 function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     let config: ResolvedConfig;
-    let entries = getEntryKV(pluginOption || pluginDefaultOption);
-    let generatedMap: string[];
+    let opt = {
+        ...defaultPluginOption,
+        ...(pluginOption ? pluginOption : {})
+    }
+    let entries: Entries = [];
+    let entryComponents: EntriesWithComponent;
     return {
         name: "vite:auto-mpa-html-plugin",
         enforce: "pre",
         buildStart: () => {
-            generatedMap = prepareTempEntries(pluginOption || pluginDefaultOption, config?.build?.outDir || "dist", entries)
+            prepareTempEntries(config.root, entries, opt, path.resolve(config.root, config.build.outDir))
         },
         buildEnd: () => {
-            cleanTempEntries(pluginOption || pluginDefaultOption, generatedMap)
+            cleanTempEntries(config.root, entries, opt)
         },
         configureServer: (server) => {
-            server.middlewares.use(devServerMiddleware(pluginOption || pluginDefaultOption, server))
+            server.middlewares.use(devServerMiddleware(config.root, entries, opt, server))
         },
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;
         },
-        config: () => {
-            if(!entries || Object.keys(entries).length === 0) console.error("[vite-plugin-auto-mpa-html] Error: 0 entry detected! Please check your plugin's option (entryName) in Vite config file.")
+        config: (config: UserConfig, env: { mode: string, command: string }) => {
+            entries = getEntries(config.root, opt.entryName)
+            if (entries.length === 0) {
+                throw new Error("[vite-plugin-auto-mpa-html] Error: 0 entry detected! Please check vite:auto-mpa-html-plugin's option in Vite config file.")
+            }
+            entryComponents = getBuildRequiredComponents(config.root, entries, opt.entryName)
+            let input: { [key: string]: string } = {}
+            entries.forEach(entry => {
+                input[entry] = entryComponents[entry].template
+            })
+
             return {
                 build: {
                     rollupOptions: {
-                        input: entries
+                        input
                     },
                 }
             }
