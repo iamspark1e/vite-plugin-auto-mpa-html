@@ -53,3 +53,4 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
 }
 
 export default autoMpaHTMLPlugin;
+export { getEntries, devServerMiddleware }

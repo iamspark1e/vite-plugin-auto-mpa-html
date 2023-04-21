@@ -46,8 +46,8 @@ export function devServerMiddleware(rootDir: string = "", entries: Entries, plug
             res.end(genDirectory(rootDir, entries, pluginOption));
             return;
         }
-        const filename = path.basename(fileUrl).replace("/index.html", "");
-        const configUrl = filename + "/config.json"
+        const filename = path.basename(fileUrl).replace("index.html", "");
+        const configUrl = filename + "config.json"
         // render as normal when no config file detected.
         if (!existsSync(configUrl)) return next();
         const temp = readFileSync(configUrl, { encoding: "utf-8" });
