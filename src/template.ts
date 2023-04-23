@@ -5,11 +5,11 @@ import {
     unlinkSync,
     writeFileSync,
 } from "fs";
-import path from 'path';
 import ejs from "ejs";
 import type { Options as EjsOptions } from "ejs";
-import { isErrorOfNotFound, MergedPluginOption, PagePluginConfig } from "./types";
-import { Entries, getBuildRequiredComponents } from "./core";
+import { isErrorOfNotFound, PagePluginConfig } from "./types";
+import { EntryPath } from "./core";
+import path from "path";
 
 export const __defaultHTMLTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -39,18 +39,18 @@ function renderEjs(
     return templateStr;
 }
 
-export function fetchTemplateHTML(pluginOption: MergedPluginOption, pageConfig: PagePluginConfig, filename: string) {
+export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig) {
     let htmlContent;
     try {
         htmlContent = readFileSync(
-            pageConfig.template || "",
+            path.resolve(entry.abs, pageConfig.template || ""),
             {
                 encoding: "utf-8",
             }
         );
     } catch (e) {
         if (isErrorOfNotFound(e)) {
-            console.warn(`Page entry: ${filename}, its template cannot be found, using default template as fallback! (${e.message})`)
+            console.warn(`Page entry: ${entry.abs}, its template cannot be found, using default template as fallback! (${e.message})`)
             htmlContent = __defaultHTMLTemplate
         } else {
             throw e
@@ -59,56 +59,53 @@ export function fetchTemplateHTML(pluginOption: MergedPluginOption, pageConfig: 
     htmlContent = renderEjs(
         htmlContent,
         {
-            ...pluginOption.sharedData,
+            ...entry.__options.sharedData,
             ...pageConfig.data,
         },
-        pluginOption.ejsOption
+        entry.__options.ejsOption
     );
-    const folderName = path.basename(filename).replace(".html", "");
-    let generatedHtml = htmlContent.replace(
+    const generatedHtml = htmlContent.replace(
         "</html>",
-        `<script type="module" src="${folderName}/${pluginOption.entryName}"></script></html>`
+        `<script type="module" src="./${entry.__options.entryName}"></script></html>`
     );
     return generatedHtml
 }
 
+/**
+ * generate entries for `rollupOptions.build.input`
+ * @param entries {Entries}
+ * @param dest {string} Output dir
+ */
 export function prepareTempEntries(
-    rootDir: string,
-    entries: Entries,
-    pluginOption: MergedPluginOption,
+    entries: EntryPath[],
     dest: string,
 ) {
     if (!existsSync(dest)) mkdirSync(dest);
-    const generatedKeys: string[] = [];
-    const entryComponents = getBuildRequiredComponents(rootDir, entries, pluginOption.entryName)
     entries.forEach(entry => {
-        let pageData: PagePluginConfig = {};
-        const configPath = entryComponents[entry].config;
+        let pageData: PagePluginConfig = {}
+        const configPath = entry.abs + "/" + entry.__options.configName;
         if (existsSync(configPath)) {
-            const tmp = readFileSync(configPath, { encoding: "utf-8" });
-            pageData = JSON.parse(tmp);
+            const tmp = readFileSync(configPath, { encoding: "utf-8" })
+            pageData = JSON.parse(tmp)
         } else {
-            throw new Error(`Page entry: ${entry}, its config (config.json) cannot be found, please check!`)
+            throw new Error(`Page entry: ${entry.abs}, its config (config.json) cannot be found, please check!`)
         }
-        let generatedHtml = fetchTemplateHTML(pluginOption, pageData, entry)
-        writeFileSync(path.resolve(`${entry}/index.html`), generatedHtml, {
+        const generatedHtml = fetchTemplateHTML(entry, pageData)
+        writeFileSync(entry.abs + "/" + entry.__options.templateName, generatedHtml, {
             encoding: "utf-8",
         });
     })
-    return generatedKeys;
 }
 
 export function cleanTempEntries(
-    rootDir: string,
-    entries: Entries,
-    pluginOption: MergedPluginOption
+    entries: EntryPath[],
 ) {
     // `buildEnd` will be called even build failed, so a throttle is needed.
     if (!entries || entries.length === 0) return;
-    const entryComponents = getBuildRequiredComponents(rootDir, entries, pluginOption.entryName)
     entries.forEach(k => {
         // generate temp entries for build
-        if (existsSync(entryComponents[k].template))
-            unlinkSync(entryComponents[k].template);
+        const absTemplatePath = k.abs + "/" + k.__options.templateName
+        if (existsSync(absTemplatePath))
+            unlinkSync(absTemplatePath);
     });
 }

@@ -2,15 +2,14 @@ import path from 'path'
 import { MergedPluginOption, PagePluginConfig } from "./types.js"
 import type { Connect, ViteDevServer } from "vite";
 import { IncomingMessage, ServerResponse } from "http";
-import { Entries, getBuildRequiredComponents } from './core.js'
-import { __defaultHTMLTemplate, fetchTemplateHTML } from "./template.js"
+import Entries from './core.js'
+import { fetchTemplateHTML } from "./template.js"
 import { existsSync, readFileSync } from 'fs';
 
-function genDirectory(rootDir: string = "", entries: string[], opt: MergedPluginOption) {
-    let entryComponents = getBuildRequiredComponents(rootDir, entries, opt.entryName)
-    let input: { [key: string]: string } = {}
-    entries.forEach(entry => {
-        input[entry] = entryComponents[entry].template
+function genDirectory(entries: Entries) {
+    const input: { [key: string]: string } = {}
+    entries.entries.forEach(entry => {
+        input[entry.value] = entry.abs + "/" + entry.__options.templateName
     })
     return `<!DOCTYPE html>
     <html lang="en">
@@ -25,8 +24,8 @@ function genDirectory(rootDir: string = "", entries: string[], opt: MergedPlugin
       <div>
         <h1 style="font-size:20px;">Directory:</h1>
         <ul>
-          ${entries.map(entry => {
-        return `<li><a target="_blank" href="${path.relative("src", entry + "/index.html")}">${entryComponents[entry].template}</a></li>`
+          ${entries.entries.map(entry => {
+        return `<li><a target="_blank" href="${entry.value + '/' + entry.__options.templateName}">${entry.value}</a></li>`
     }).join("")}
         </ul>
       </div>
@@ -34,7 +33,7 @@ function genDirectory(rootDir: string = "", entries: string[], opt: MergedPlugin
     </html>`
 }
 
-export function devServerMiddleware(rootDir: string = "", entries: Entries, pluginOption: MergedPluginOption, server: ViteDevServer) {
+export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, server: ViteDevServer) {
     return async (
         req: Connect.IncomingMessage,
         res: ServerResponse<IncomingMessage>,
@@ -42,17 +41,27 @@ export function devServerMiddleware(rootDir: string = "", entries: Entries, plug
     ) => {
         const fileUrl = req.url || "";
         if (!fileUrl.endsWith("index.html") && fileUrl !== "/") return next();
-        if (pluginOption.enableDevDirectory && fileUrl.endsWith("/")) {
-            res.end(genDirectory(rootDir, entries, pluginOption));
+        if (opt.enableDevDirectory && fileUrl.endsWith("/")) {
+            res.end(genDirectory(entries));
             return;
         }
-        const filename = path.basename(fileUrl).replace("index.html", "");
-        const configUrl = filename + "config.json"
+        const dirname = path.dirname(fileUrl);
+        const foundedEntry = entries.entries.find(entry => {
+          if(dirname === "/") {
+            if(entry.value === ".") return true;
+          } else {
+            if("/" + entry.value === dirname) return true;
+          }
+          return false;
+        })
+
+        if(!foundedEntry) return next();
+        const configUrl = foundedEntry.abs + "/" + foundedEntry.__options.configName
         // render as normal when no config file detected.
         if (!existsSync(configUrl)) return next();
         const temp = readFileSync(configUrl, { encoding: "utf-8" });
         const pageConfig: PagePluginConfig = JSON.parse(temp);
-        let generatedHtml = fetchTemplateHTML(pluginOption, pageConfig, filename)
+        let generatedHtml = fetchTemplateHTML(foundedEntry, pageConfig)
         generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
         res.end(generatedHtml);
     };
