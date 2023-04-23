@@ -6,7 +6,7 @@ import Entries from './core.js'
 import { fetchTemplateHTML } from "./template.js"
 import { existsSync, readFileSync } from 'fs';
 
-function genDirectory(entries: Entries) {
+export function genDirectory(entries: Entries) {
     const input: { [key: string]: string } = {}
     entries.entries.forEach(entry => {
         input[entry.value] = entry.abs + "/" + entry.__options.templateName

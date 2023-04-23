@@ -1,5 +1,5 @@
 {
-    "template": "tests/example/templates/tpl.html",
+    "template": "../templates/tpl.html",
     "data": {
         "title": "Something else that not match tpl's title"
     }

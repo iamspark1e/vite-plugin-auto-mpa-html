@@ -18,7 +18,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         name: "vite:auto-mpa-html-plugin",
         enforce: "pre",
         buildStart: () => {
-            prepareTempEntries(entries.entries, config.build.outDir)
+            prepareTempEntries(entries.entries)
         },
         buildEnd: () => {
             cleanTempEntries(entries.entries)

@@ -106,6 +106,7 @@
   "exclude": [
     "vitest.config.ts",
     "**/dist/",
-    "commitlint.config.js"
+    "commitlint.config.js",
+    "tests"
   ]
 }

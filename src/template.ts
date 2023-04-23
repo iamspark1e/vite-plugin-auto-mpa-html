@@ -1,6 +1,5 @@
 import {
     existsSync,
-    mkdirSync,
     readFileSync,
     unlinkSync,
     writeFileSync,
@@ -17,9 +16,9 @@ export const __defaultHTMLTemplate = `<!DOCTYPE html>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= (typeof title != 'undefined' ? title : '') %></title>
-    <meta name="description" content="<%= (typeof description != 'undefined' ? description : '') %>" />
-    <meta name="keywords" content="<%= (typeof keywords != 'undefined' ? keywords : '') %>" />
+    <title><%- (typeof title != 'undefined' ? title : '') %></title>
+    <meta name="description" content="<%- (typeof description != 'undefined' ? description : '') %>" />
+    <meta name="keywords" content="<%- (typeof keywords != 'undefined' ? keywords : '') %>" />
   </head>
   <body>
     <div id="app"></div>
@@ -78,9 +77,7 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
  */
 export function prepareTempEntries(
     entries: EntryPath[],
-    dest: string,
 ) {
-    if (!existsSync(dest)) mkdirSync(dest);
     entries.forEach(entry => {
         let pageData: PagePluginConfig = {}
         const configPath = entry.abs + "/" + entry.__options.configName;

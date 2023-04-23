@@ -1,6 +1,6 @@
 
-import { describe, it, expect } from "vitest";
-import { getEntries } from "../src/core";
+import { describe, it, expect, beforeAll } from "vitest";
+import Entries from "../src/core";
 import type { MergedPluginOption } from "../src/types";
 
 const pluginOption: MergedPluginOption = {
@@ -8,15 +8,23 @@ const pluginOption: MergedPluginOption = {
   enableDevDirectory: false
 };
 
-describe("Test base function - getEntryKV", () => {
+describe("Test base function - generate entries", () => {
+  let entries: Entries;
+  beforeAll(() => {
+    entries = new Entries({
+      root: "tests/example/src"
+    }, pluginOption)
+  })
+
   it("should count entries correctly", () => {
-    const data = getEntries("tests/example/src", pluginOption.entryName);
-    expect(data).toContain("tests/example/src");
-    
+    expect(entries).toSatisfy((entries: Entries) => {
+      return Boolean(entries.entries.find(path => path.value === "."))
+    });
   });
 
   it("nested folder should be captured", () => {
-    const data = getEntries("tests/example/src", pluginOption.entryName);
-    expect(data).toContain("tests/example/src/subdir");
+    expect(entries).toSatisfy((entries: Entries) => {
+      return Boolean(entries.entries.find(path => path.value === "subdir"))
+    });
   });
 });
