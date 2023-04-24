@@ -21,7 +21,6 @@ export const defaultPluginOption = {
 
 export type PagePluginConfig = {
     template?: string;
-    serverInjectMarkup?: string;
     data?: object;
 };
 
