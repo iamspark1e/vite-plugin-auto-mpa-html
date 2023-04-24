@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-auto-mpa-html",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.1",
   "description": "A file directory-based automated multi-page Vite plugin that supports HTML templates using EJS.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

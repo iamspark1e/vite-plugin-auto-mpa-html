@@ -1,3 +1,12 @@
+# [1.0.0-alpha.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.0-alpha.0...v1.0.0-alpha.1) (2023-04-24)
+
+
+### Bug Fixes
+
+* add security detection for exist HTML files ([8113dfe](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/8113dfe4ce2f86e47f5e329beb70a06c8d559c5f))
+
+
+
 # [1.0.0-alpha.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v0.1.1...v1.0.0-alpha.0) (2023-04-23)
 
 
