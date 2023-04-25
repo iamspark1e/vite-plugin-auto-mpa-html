@@ -87,7 +87,7 @@ export function prepareTempEntries(
             const tmp = readFileSync(configPath, { encoding: "utf-8" })
             pageData = JSON.parse(tmp)
         } else {
-            throw new Error(`Page entry: ${entry.abs}, its config (config.json) cannot be found, please check!`)
+            _console.fatal(`Page entry: ${entry.abs}, its config (config.json) cannot be found, please check!`)
         }
         const generatedHtml = fetchTemplateHTML(entry, pageData)
         if (existsSync(entry.abs + "/" + entry.__options.templateName)) {
