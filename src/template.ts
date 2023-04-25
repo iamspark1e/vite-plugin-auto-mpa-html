@@ -6,9 +6,11 @@ import {
 } from "fs";
 import ejs from "ejs";
 import type { Options as EjsOptions } from "ejs";
-import { isErrorOfNotFound, PagePluginConfig } from "./types";
+import { isErrorOfNotFound, PagePluginConfig, ColoringConsole } from "./types";
 import { EntryPath } from "./core";
 import path from "path";
+
+const _console = new ColoringConsole(1)
 
 export const __defaultHTMLTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -49,7 +51,7 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
         );
     } catch (e) {
         if (isErrorOfNotFound(e)) {
-            console.warn(`Page entry: ${entry.abs}, its template cannot be found, using default template as fallback! (${e.message})`)
+            _console.error(`Page entry "${entry.abs}", its template cannot be found, using default template as fallback! (${e.message})`)
             htmlContent = __defaultHTMLTemplate
         } else {
             throw e
@@ -89,7 +91,7 @@ export function prepareTempEntries(
         }
         const generatedHtml = fetchTemplateHTML(entry, pageData)
         if (existsSync(entry.abs + "/" + entry.__options.templateName)) {
-            console.error(`There is a same name HTML file already exist in entry '${entry.value}', template generation skipped`)
+            _console.warn(`There is an "index.html" file already exist in entry '${entry.value}', template generation skipped`)
             return;
         }
         writeFileSync(entry.abs + "/" + entry.__options.templateName, generatedHtml, {
