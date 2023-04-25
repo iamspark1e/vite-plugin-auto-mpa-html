@@ -6,3 +6,4 @@ temp
 debug
 lib
 coverage
+**/dist

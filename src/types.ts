@@ -1,28 +1,96 @@
 import type { Options as EjsOption } from "ejs";
+
 export type PluginOption = {
-  configName?: string; // config.js / config.json
-  entryName?: string; // main.(js/ts) / index.(js/ts)
-  sourceDir?: string; // scan entries under this dir
-  ejsOption?: EjsOption; // see: https://github.com/mde/ejs#options
-  sharedData?: object; // will be merged into every page's data
-  enableDirectoryPage?: boolean;
-};
-export const pluginDefaultOption: PluginOption = {
-  configName: "config.js",
-  entryName: "main.js",
-  sourceDir: "src",
-};
+    entryName?: string;                 // default:main.js
+    ejsOption?: EjsOption;
+    sharedData?: object;                // will be merged into every page's data
+    enableDevDirectory?: boolean;
+}
+
+export type MergedPluginOption = {
+    entryName: string;                 // default:main.js
+    ejsOption?: EjsOption;
+    sharedData?: object;                // will be merged into every page's data
+    enableDevDirectory: boolean;
+}
+
+export const defaultPluginOption = {
+    entryName: "main.js",
+    enableDevDirectory: true
+}
 
 export type PagePluginConfig = {
-  template?: string;
-  serverInjectMarkup?: string;
-  data?: object;
+    template?: string;
+    data?: object;
 };
-export const pagePluginDefaultConfig = {
-  template: "node_modules/vite-plugin-auto-mpa-html/assets/index.html",
-  data: {
-    title: "",
-    description: "",
-    keywords: "",
-  },
-};
+
+type ErrorOfNotFound = {
+    code: string;
+    message: string;
+}
+
+export function isErrorOfNotFound(error: unknown): error is ErrorOfNotFound {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        'message' in error &&
+        typeof (error as Record<string, unknown>).code === 'string' &&
+        typeof (error as Record<string, unknown>).message === 'string'
+    )
+}
+
+enum PluginCustomizedErrorLevel {
+    fatal = 0,
+    warn,
+    info,
+    debug, // fatal error will be thrown
+}
+
+class PluginCustomizedError extends Error {
+    errorLevel: PluginCustomizedErrorLevel;
+    constructor(message: string, errorLevel: PluginCustomizedErrorLevel = 0) {
+        super(message)
+
+        this.errorLevel = errorLevel
+        this.name = "VitePluginAutoMpaHTMLError"
+        this.message = `[vite-plugin-auto-mpa-html]: ${message}`
+    }
+}
+
+// Plugin's custom errors
+export class ColoringConsole {
+    envErrorLevel: PluginCustomizedErrorLevel = 0;
+
+    constructor(envErrorLevel: PluginCustomizedErrorLevel = 0) {
+        if (envErrorLevel) this.envErrorLevel = envErrorLevel
+    }
+
+    /**
+     * @see {@link https://sparkle.im/post/node-js%E7%8E%AF%E5%A2%83log%E9%A2%9C%E8%89%B2%E8%A1%A8}
+     * default "debug" color is white
+     */
+    private coloredMsg = (msg: string, colorPrefix: string = "\x1b[37m") => {
+        return `${colorPrefix}[vite-plugin-auto-mpa-html]: ${msg}\x1b[0m`
+    }
+
+    debug = (msg: string) => {
+        if (this.envErrorLevel >= 3) console.log(this.coloredMsg(msg))
+    }
+
+    log = (msg: string) => {
+        if (this.envErrorLevel >= 2) console.log(this.coloredMsg(msg, '\x1b[34m'))
+    }
+
+    warn = (msg: string) => {
+        if (this.envErrorLevel >= 1) console.log(this.coloredMsg(msg, '\x1b[33m'))
+    }
+
+    error = (msg: string) => {
+        if (this.envErrorLevel >= 1) console.log(this.coloredMsg(msg, '\x1b[31m'))
+    }
+
+    fatal = (msg: string) => {
+        throw new PluginCustomizedError(msg, 3)
+    }
+}

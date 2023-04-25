@@ -1,34 +1,51 @@
-import getEntryKV from './src/entry.js'
-import { prepareTempEntries, cleanTempEntries, devServerMiddleware } from './src/vite-lifecycle.js'
-import { pluginDefaultOption } from './src/types.js'
-import type { Plugin, ResolvedConfig } from 'vite'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// import { devServerMiddleware } from './src/dev-middleware.js'
+import { MergedPluginOption, defaultPluginOption, ColoringConsole } from './src/types.js'
+import { cleanTempEntries, prepareTempEntries } from './src/template.js'
+import Entries from './src/core.js'
 import type { PluginOption } from './src/types.js'
+import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
+import { devServerMiddleware } from './src/dev-middleware.js'
 
 function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     let config: ResolvedConfig;
-    let entries = getEntryKV(pluginOption || pluginDefaultOption);
-    let generatedMap: string[];
+    const opt: MergedPluginOption = {
+        ...defaultPluginOption,
+        ...(pluginOption ? pluginOption : {})
+    }
+    let entries: Entries;
+    const _console = new ColoringConsole(1)
     return {
         name: "vite:auto-mpa-html-plugin",
         enforce: "pre",
         buildStart: () => {
-            generatedMap = prepareTempEntries(pluginOption || pluginDefaultOption, config?.build?.outDir || "dist", entries)
+            prepareTempEntries(entries.entries)
         },
         buildEnd: () => {
-            cleanTempEntries(pluginOption || pluginDefaultOption, generatedMap)
+            cleanTempEntries(entries.entries)
         },
         configureServer: (server) => {
-            server.middlewares.use(devServerMiddleware(pluginOption || pluginDefaultOption, server))
+            server.middlewares.use(devServerMiddleware(entries, opt, server))
         },
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;
         },
-        config: () => {
-            if(!entries || Object.keys(entries).length === 0) console.error("[vite-plugin-auto-mpa-html] Error: 0 entry detected! Please check your plugin's option (entryName) in Vite config file.")
+        config: (config: UserConfig, _env: { mode: string, command: string }) => {
+            entries = new Entries(config, opt)
+            if (entries.entries.length === 0) {
+                _console.fatal("0 entry detected! Please check plugin's option in Vite config file.")
+            }
+            const input: { [key: string]: string } = {}
+            entries.entries.forEach(entry => {
+                let entryName = entry.value;
+                if (entryName === "") entryName = "main";
+                input[entryName] = entry.abs + "/" + entry.__options.templateName
+            })
+
             return {
                 build: {
                     rollupOptions: {
-                        input: entries
+                        input
                     },
                 }
             }
