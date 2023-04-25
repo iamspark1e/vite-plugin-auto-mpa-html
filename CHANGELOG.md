@@ -1,3 +1,13 @@
+# [1.0.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.0-alpha.1...v1.0.0) (2023-04-25)
+
+
+### Features
+
+* **debug:** add colorized console for plugin fatals ([2241370](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/2241370035f73bf3a820820b04dc09a7cfb6a2db))
+* **debug:** add colorized console for plugin messages ([a3ced67](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/a3ced67fa5bcc7154f733dad4604ab3c3262faea))
+
+
+
 # [1.0.0-alpha.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.0-alpha.0...v1.0.0-alpha.1) (2023-04-24)
 
 
