@@ -91,7 +91,7 @@ describe("Test plugin's lifecycle - buildStart (with incorrect configuration)", 
             prepareTempEntries(entries.entries);
         } catch (e) {
             expect(e).toBeInstanceOf(PluginCustomizedError)
-            expect(e.message).toBe("Page entry: no-config, its config (config.json) cannot be found, please check!")
+            expect(e.message).toBe("[vite-plugin-auto-mpa-html]: Page entry: no-config, its config (config.json) cannot be found, please check!")
         }
     })
 

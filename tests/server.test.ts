@@ -13,9 +13,10 @@ const pluginOption: MergedPluginOption = {
 };
 
 describe("Test plugin's lifecycle - devServer", async () => {
-  const tmp = connect();
+  let tmp
   let entries: Entries;
   beforeAll(async () => {
+    tmp = connect();
     const viteServer = await createServer({
       root: path.resolve(__dirname, "example", "src"),
       server: {
@@ -48,6 +49,45 @@ describe("Test plugin's lifecycle - devServer", async () => {
   it("devMiddleware should not block html if exist in public folder", async () => {
     const res = await request(tmp).get("/should-keep.html");
     expect(res.text).toMatch("<body><h1>Should be kept</h1></body>");
+  });
+
+  it("devMiddleware should generate directory page", async () => {
+    const res = await request(tmp).get("/");
+    expect(res.text).toMatch("<title>Project Directory</title>");
+  });
+
+  afterAll(() => {
+    tmp = null;
+    vi.restoreAllMocks();
+  });
+});
+
+describe.todo("Test plugin's lifecycle - devServer (disabled directory page)", async () => {
+  let tmp
+  let entries: Entries;
+  beforeAll(async () => {
+    tmp = connect()
+    const viteServer = await createServer({
+      root: path.resolve(__dirname, "example", "src"),
+      server: {
+        middlewareMode: true,
+      },
+      appType: "custom",
+      publicDir: "./public"
+    });
+    entries = new Entries({
+      root: "tests/example/src"
+    }, {
+      entryName: "main.jsx",
+      enableDevDirectory: false
+    })
+    tmp.use(viteServer.middlewares);
+    tmp.use(devServerMiddleware(entries, pluginOption, viteServer));
+  });
+
+  it("devMiddleware should not generate directory page if plugin options set `enableDevDirectory` to false", async () => {
+    const res = await request(tmp).get("/");
+    expect(res.text).toMatch("<title>This is the rootDir of vite config</title>");
   });
 
   afterAll(() => {

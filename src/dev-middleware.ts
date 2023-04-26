@@ -42,8 +42,8 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
         const fileUrl = req.url || "";
         if (!fileUrl.endsWith("index.html") && fileUrl !== "/") return next();
         if (opt.enableDevDirectory && fileUrl.endsWith("/")) {
-            res.end(genDirectory(entries));
-            return;
+          res.end(genDirectory(entries));
+          return;
         }
         const dirname = path.dirname(fileUrl);
         const foundedEntry = entries.entries.find(entry => {
