@@ -47,7 +47,7 @@ enum PluginCustomizedErrorLevel {
     debug, // fatal error will be thrown
 }
 
-class PluginCustomizedError extends Error {
+export class PluginCustomizedError extends Error {
     errorLevel: PluginCustomizedErrorLevel;
     constructor(message: string, errorLevel: PluginCustomizedErrorLevel = 0) {
         super(message)
@@ -87,10 +87,10 @@ export class ColoringConsole {
     }
 
     error = (msg: string) => {
-        if (this.envErrorLevel >= 1) console.log(this.coloredMsg(msg, '\x1b[31m'))
+        if (this.envErrorLevel >= 0) console.log(this.coloredMsg(msg, '\x1b[31m'))
     }
 
     fatal = (msg: string) => {
-        throw new PluginCustomizedError(msg, 3)
+        throw new PluginCustomizedError(msg, 0)
     }
 }
