@@ -32,7 +32,7 @@ function renderEjs(
     data?: object,
     ejsOption?: EjsOptions
 ): string {
-    if (data)
+    if (data && Object.keys(data).length > 0)
         return ejs.render(templateStr, data, {
             ...ejsOption,
             async: false,
@@ -50,12 +50,9 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
             }
         );
     } catch (e) {
-        if (isErrorOfNotFound(e)) {
-            _console.error(`Page entry "${entry.abs}", its template cannot be found, using default template as fallback! (${e.message})`)
-            htmlContent = __defaultHTMLTemplate
-        } else {
-            throw e
-        }
+        if (!isErrorOfNotFound(e)) throw e;
+        _console.error(`Page entry "${entry.abs}", its template cannot be found, using default template as fallback! (${e.message})`)
+        htmlContent = __defaultHTMLTemplate
     }
     htmlContent = renderEjs(
         htmlContent,
@@ -87,7 +84,7 @@ export function prepareTempEntries(
             const tmp = readFileSync(configPath, { encoding: "utf-8" })
             pageData = JSON.parse(tmp)
         } else {
-            _console.fatal(`Page entry: ${entry.abs}, its config (config.json) cannot be found, please check!`)
+            _console.fatal(`Page entry: ${entry.value}, its config (config.json) cannot be found, please check!`)
         }
         const generatedHtml = fetchTemplateHTML(entry, pageData)
         if (existsSync(entry.abs + "/" + entry.__options.templateName)) {

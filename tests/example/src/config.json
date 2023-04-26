@@ -1,6 +1,6 @@
 {
-    "template": "../templates/tpl.html",
+    "template": "../templates/ejs-title.html",
     "data": {
-        "title": "Something else that not match tpl's title"
+        "title": "This is the rootDir of vite config"
     }
 }
