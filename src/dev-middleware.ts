@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'fs';
 export function genDirectory(entries: Entries) {
     const input: { [key: string]: string } = {}
     entries.entries.forEach(entry => {
-        input[entry.value] = entry.abs + "/" + entry.__options.templateName
+        input[entry.value] = entry.abs + entry.__options.templateName
     })
     return `<!DOCTYPE html>
     <html lang="en">
@@ -25,7 +25,7 @@ export function genDirectory(entries: Entries) {
         <h1 style="font-size:20px;">Directory:</h1>
         <ul>
           ${entries.entries.map(entry => {
-        return `<li><a target="_blank" href="${entry.value + '/' + entry.__options.templateName}">${entry.value}</a></li>`
+        return `<li><a target="_blank" href="${entry.value + entry.__options.templateName}">${entry.value}</a></li>`
     }).join("")}
         </ul>
       </div>

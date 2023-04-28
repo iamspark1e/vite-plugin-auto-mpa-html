@@ -39,7 +39,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             entries.entries.forEach(entry => {
                 let entryName = entry.value;
                 if (entryName === "") entryName = "main";
-                input[entryName] = entry.abs + "/" + entry.__options.templateName
+                input[entryName] = entry.abs + entry.__options.templateName
             })
 
             return {

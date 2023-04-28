@@ -114,6 +114,15 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    * @default "main.js"
    */
   entryName: string
+  /**
+   * Experimental features for plugin, using at your own risk!
+   */
+  experimental?: {
+    /**
+     * Re-define template name, if you want to put the HTML to the parent folder of "entry", you can use `.html` to directly use entry path as HTML path.
+     */
+    customTemplateName?: string
+  }
 }
 ```
 

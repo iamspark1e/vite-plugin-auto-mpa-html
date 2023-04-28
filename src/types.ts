@@ -5,6 +5,11 @@ export type PluginOption = {
     ejsOption?: EjsOption;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
+    experimental?: ExperimentalPluginOption;
+}
+
+export type ExperimentalPluginOption = {
+    customTemplateName?: string;
 }
 
 export type MergedPluginOption = {
@@ -12,11 +17,13 @@ export type MergedPluginOption = {
     ejsOption?: EjsOption;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
+    experimental?: ExperimentalPluginOption;
 }
 
 export const defaultPluginOption = {
     entryName: "main.js",
-    enableDevDirectory: true
+    enableDevDirectory: true,
+    experimental: {}
 }
 
 export type PagePluginConfig = {
