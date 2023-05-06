@@ -26,10 +26,13 @@ export default class Entries {
     entryName: string = "main.js"
 
     constructor(config: UserConfig, pluginOption: MergedPluginOption) {
+        const _console = new ColoringConsole(1)
+        if(pluginOption.experimental) {
+            _console.warn("You are using experimental features which are not stable, features may change without migration or notification!")
+        }
         if(pluginOption.experimental && pluginOption.experimental.customTemplateName) {
             this.templateName = pluginOption.experimental.customTemplateName
             if(!this.templateName.startsWith("/")) {
-                const _console = new ColoringConsole(1)
                 _console.warn("You are putting temporary entries' parent folder which may cause unexpected file lost, using this feature at your own risk!")
             }
         }
