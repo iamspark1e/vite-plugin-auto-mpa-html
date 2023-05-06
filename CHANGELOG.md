@@ -1,3 +1,21 @@
+## [1.0.1-beta.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.0...v1.0.1-beta.0) (2023-05-06)
+
+
+### Bug Fixes
+
+* **coverage:** uncovered branches about `src/tyemplate.ts` ([1207a70](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/1207a709d5bdaaf3ae0caa5b2635a734e6b2d454))
+* **coverage:** uncovered branches about `src/types.ts` ([03ff770](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/03ff7704e76ce454937f18582bedb810df7eebaa))
+* **coverage:** uncovered branches in `src/dev-middleware.ts` ([3a7315e](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/3a7315ea03e5d46d6d52fa8fb5e60399b661db05))
+* **coverage:** uncovered tests in `tests/server.test.ts` ([7954b9a](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/7954b9a25c8a4461ff9c6974098fd355cf885e10))
+
+
+### Features
+
+* add auto coverage test for main branch ([45c9b51](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/45c9b518dcf383a10f345771531d766c8f16322e))
+* add experimental feature - customTemplateName ([70a1c2b](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/70a1c2bdf69ca236743c66545686c5daf5f994a0))
+
+
+
 # [1.0.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.0-alpha.1...v1.0.0) (2023-04-25)
 
 
