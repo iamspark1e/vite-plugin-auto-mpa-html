@@ -1,3 +1,12 @@
+## [1.0.1-beta.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.1-beta.0...v1.0.1-beta.1) (2023-05-06)
+
+
+### Bug Fixes
+
+* fix different generated entry HTML script path ([94c0fd8](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/94c0fd87ac9628f0c5cfcf515bb07ab06e0759b4))
+
+
+
 ## [1.0.1-beta.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.0...v1.0.1-beta.0) (2023-05-06)
 
 
