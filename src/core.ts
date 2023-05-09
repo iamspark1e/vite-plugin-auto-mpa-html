@@ -41,7 +41,7 @@ export default class Entries {
         const globPath = `**/${this.entryName}`
         // (\/|\\\\) posix/darwin adaption
         // const pathDir = "(/|\\\\)(.*?)(/|\\\\)";
-        const files = globSync(globPath, {cwd: rootDir});
+        const files = globSync(globPath, {cwd: rootDir, ignore: 'node_modules/**'});
         for (let i = 0; i < files.length; i++) {
             const dirname = path.dirname(files[i]);
             const fullDirname: EntryPath = {
