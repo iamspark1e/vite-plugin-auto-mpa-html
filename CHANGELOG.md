@@ -1,3 +1,12 @@
+## [1.0.1-beta.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.1-beta.1...v1.0.1-beta.2) (2023-05-09)
+
+
+### Bug Fixes
+
+* add ignore node_modules incase using plugin without `root` path configured ([d17b87a](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/d17b87a3d6d7b9c7c2ba3ad48a227f257d218ac4))
+
+
+
 ## [1.0.1-beta.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.1-beta.0...v1.0.1-beta.1) (2023-05-06)
 
 
