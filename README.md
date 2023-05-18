@@ -85,6 +85,19 @@ Manually create a `config.json` in the subdirectory of the page, with these cont
 }
 ```
 
+> We put all pages into different folders under `src`, some additional config should be put into `vite.config.js`
+>
+> ```javascript
+> export default defineConfig({
+>   root: "src",
+>   base: "",
+>   build: {
+>     outDir: "../dist",
+>     emptyOutDir: true,
+>   }
+> })
+> ```
+
 Finished, everything is ready, run `npm run build` to see what is built with `vite-plugin-auto-mpa-html`.
 
 > A temporary `index.html` will be generated to every entry, just beside your entry file, such as `main.jsx` or `main.js`, PLEASE take care!
