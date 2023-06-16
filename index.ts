@@ -38,7 +38,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             const input: { [key: string]: string } = {}
             entries.entries.forEach(entry => {
                 let entryName = entry.value;
-                if (entryName === "") entryName = "main";
+                if (entryName === "" || entryName === ".") entryName = "_root";
                 input[entryName] = entry.abs + entry.__options.templateName
             })
 
