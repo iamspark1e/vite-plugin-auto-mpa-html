@@ -1,3 +1,13 @@
+## [1.0.1-beta.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.1-beta.2...v1.0.1-beta.3) (2023-06-16)
+
+
+### Bug Fixes
+
+* add new option `experimental.rootEntryDistName` to customize the "root entry" asset names & fix `experimental.customTemplateName` may case pollution outer dist folder ([93d9ef1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/93d9ef106f3e94b005d0e63a515ce989f6fe504c))
+* **test:** add fallback entry name in case entry was placed in root dir ([2d840c1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/2d840c1449c744b08e7add886d3fc1e41ecc9a61))
+
+
+
 ## [1.0.1-beta.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.1-beta.1...v1.0.1-beta.2) (2023-05-09)
 
 
