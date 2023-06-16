@@ -10,6 +10,7 @@ export type PluginOption = {
 
 export type ExperimentalPluginOption = {
     customTemplateName?: string;
+    rootEntryDistName?: string; // if an entry is placed at the root folder of vite config's `root`, you can change its name, use "_root" as default. 
 }
 
 export type MergedPluginOption = {

@@ -4,7 +4,7 @@
   <a href="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html" ><img src="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html/branch/main/graph/badge.svg?token=xW4J4R4P7b"/></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/v/vite-plugin-auto-mpa-html" /></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/dm/vite-plugin-auto-mpa-html" /></a>
-  <img src="https://img.shields.io/badge/Vite-%5E3.2.3%7C4-brightgreen" />
+  <img src="https://img.shields.io/badge/Vite-%5E2.9.15%7C%5E3.2.3%7C4-brightgreen" />
 </p>
 
 <p align='center'>A file directory-based automated multi-page Vite plugin that supports HTML templates using EJS.</p>
@@ -133,8 +133,13 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
   experimental?: {
     /**
      * Re-define template name, if you want to put the HTML to the parent folder of "entry", you can use `.html` to directly use entry path as HTML path.
+     * [NOTICE] When `customTemplateName` equals ".html" (which means you want to reduce folder levels), it's NOT allowed to put entry files directly under root folder.
      */
     customTemplateName?: string
+    /**
+     * Config the asset name of root's entry file, default value is "_root"
+     */
+    rootEntryDistName?: string
   }
 }
 ```
@@ -161,6 +166,8 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
 - Nested folder is __SUPPORTED__ from v1, but will generate a temporary `index.html` besides your entry file.
 
 - Env files is only supported in root folder (same level as `vite.config.js`), env-per-entry is __NOT SUPPORTED__.
+
+- When `experimental.customTemplateName` equals ".html" (which means you want to reduce folder levels), it's NOT allowed to put entry files directly under root folder.
 
 ## Vite native features
 
