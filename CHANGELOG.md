@@ -1,3 +1,12 @@
+## [1.0.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.1-beta.3...v1.0.1) (2023-07-10)
+
+
+### Bug Fixes
+
+* nested folder tests are skipped, fix nested folder does not compile issue ([106e2a2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/106e2a2d805ba4f9e5ce8b3e4831f2e621eadd2f))
+
+
+
 ## [1.0.1-beta.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.0.1-beta.2...v1.0.1-beta.3) (2023-06-16)
 
 
