@@ -7,7 +7,10 @@
   <img src="https://img.shields.io/badge/Vite-%5E2.9.15%7C%5E3.2.3%7C4-brightgreen" />
 </p>
 
+<p align='center'>English | <a href="./README.zh.md">中文文档</a></p>
+<br />
 <p align='center'>A file directory-based automated multi-page Vite plugin that supports HTML templates using EJS.</p>
+<p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 EJS 的 HTML 模板。</p>
 <br />
 
 ## Quick Start
