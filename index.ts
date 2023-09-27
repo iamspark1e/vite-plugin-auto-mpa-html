@@ -14,15 +14,20 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         ...(pluginOption ? pluginOption : {})
     }
     let entries: Entries;
+    let cmd: string;
     const _console = new ColoringConsole(1)
     return {
         name: "vite:auto-mpa-html-plugin",
         enforce: "pre",
+        apply(config, { command }) {
+            cmd = command;
+            return true;
+        },
         buildStart: () => {
-            prepareTempEntries(entries.entries)
+            if(cmd !== 'serve') prepareTempEntries(entries.entries)
         },
         buildEnd: () => {
-            cleanTempEntries(entries.entries)
+            if(cmd !== 'serve') cleanTempEntries(entries.entries)
         },
         configureServer: (server) => {
             server.middlewares.use(devServerMiddleware(entries, opt, server))
