@@ -54,21 +54,15 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
       }
       let dirname = matchedFolder[1];
       foundedEntry = entries.entries.find(entry => {
-        if (dirname === "/") {
-          if (entry.value === ".") return true;
-        } else {
-          if (entry.value === dirname) return true;
-        }
+        if (entry.value === dirname) return true;
         return false;
       })
     } else {
       if(opt.experimental?.customTemplateName && !fileUrl.endsWith(opt.experimental.customTemplateName)) return next();
       dirname = path.dirname(fileUrl);
       foundedEntry = entries.entries.find(entry => {
-        if (dirname === "/") {
-          if (entry.value === ".") return true;
-        } else {
-          if ("/" + entry.value === dirname) return true;
+        if ((dirname === "/" && entry.value === ".") || ("/" + entry.value === dirname)) {
+          return true;
         }
         return false;
       })

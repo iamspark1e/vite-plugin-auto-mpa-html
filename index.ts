@@ -46,7 +46,6 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                 if (entryName === "" || entryName === ".") {
                     if(opt.experimental?.customTemplateName === ".html") {
                         _console.fatal("When `customTemplateName`'s value is \".html\", it's not able to put entry files directly under root dir (To prevent pollute files outside the `dist` option). Please resolve this conflict first!")
-                        return;
                     } else {
                         entryName = opt.experimental?.rootEntryDistName || "_root";
                     }
