@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { devServerMiddleware } from './src/dev-middleware.js'
 import { MergedPluginOption, defaultPluginOption, ColoringConsole } from './src/types.js'
-import { cleanTempEntries, prepareTempEntries } from './src/template.js'
+import { cleanTempEntries, prepareTempEntries, prepareVirtualTempEntries } from './src/template.js'
 import Entries from './src/core.js'
 import type { PluginOption } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
@@ -15,7 +15,9 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     }
     let entries: Entries;
     let cmd: string;
-    const _console = new ColoringConsole(1)
+    const _console = new ColoringConsole(1);
+    const PREFIX = '\0virtual-auto-mpa-html:'
+    let virtualMap: Map<string, string>;
     return {
         name: "vite:auto-mpa-html-plugin",
         enforce: "pre",
@@ -23,8 +25,23 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             cmd = command;
             return true;
         },
+        resolveId: (id, importer) => {
+            if(id.startsWith(PREFIX)) {
+                return id;
+            }
+        },
+        load: (id) => {
+            if(id.startsWith(PREFIX)) {
+                console.log("detect \0")
+                const idNoPrefix = id.slice(PREFIX.length);
+                return virtualMap.get(idNoPrefix);
+            }
+        },
         buildStart: () => {
-            if(cmd !== 'serve') prepareTempEntries(entries.entries)
+            if(cmd !== 'serve') {
+                // prepareTempEntries(entries.entries)
+                virtualMap = prepareVirtualTempEntries(entries.entries);
+            }
         },
         buildEnd: () => {
             if(cmd !== 'serve') cleanTempEntries(entries.entries)
@@ -37,6 +54,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         },
         config: (config: UserConfig, _env: { mode: string, command: string }) => {
             entries = new Entries(config, opt)
+            console.log("dev mode 1")
             if (entries.entries.length === 0) {
                 _console.fatal("0 entry detected! Please check plugin's option in Vite config file.")
             }
@@ -45,20 +63,19 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                 let entryName = entry.value;
                 if (entryName === "" || entryName === ".") {
                     if(opt.experimental?.customTemplateName === ".html") {
-                        _console.fatal("When `customTemplateName`'s value is \".html\", it's not able to put entry files directly under root dir (To prevent pollute files outside the `dist` option). Please resolve this conflict first!")
-                        return;
+                        _console.fatal("When `customTemplateName`'s value is \".html\", it's not able to put entry files directly under root dir (To prevent pollute files outside the `dist` option). Please resolve this conflict first!");
                     } else {
                         entryName = opt.experimental?.rootEntryDistName || "_root";
                     }
                 }
-                input[entryName] = entry.abs + entry.__options.templateName
+                // input[entryName] = entry.abs + entry.__options.templateName
+                input[entryName] = PREFIX + entry.abs + entry.__options.templateName
             })
-
             return {
                 build: {
                     rollupOptions: {
                         input
-                    },
+                    }
                 }
             }
         },

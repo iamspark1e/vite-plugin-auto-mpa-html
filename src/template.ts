@@ -65,7 +65,8 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
     );
     const generatedHtml = GENERATED_FLAG.concat(htmlContent).replace(
         "</html>",
-        `<script type="module" src="${entry.__options.templateName.startsWith("/") ? `./${entry.__options.entryName}` : `./${entry.value.includes('/') ? entry.value.split('/').reverse()[0] : entry.value}/${entry.__options.entryName}`}"></script></html>`
+        // `<script type="module" src="${entry.__options.templateName.startsWith("/") ? `./${entry.__options.entryName}` : `./${entry.value.includes('/') ? entry.value.split('/').reverse()[0] : entry.value}/${entry.__options.entryName}`}"></script></html>`
+        `<script type="module" src="${entry.abs + '/' + entry.__options.entryName}"></script></html>`
     );
     return generatedHtml
 }
@@ -99,6 +100,35 @@ export function prepareTempEntries(
             encoding: "utf-8",
         });
     })
+}
+
+export function prepareVirtualTempEntries(
+    entries: EntryPath[],
+) {
+    let virtualMap = new Map<string, string>();
+    entries.forEach(entry => {
+        let pageData: PagePluginConfig = {}
+        const configPath = entry.abs + "/" + entry.__options.configName;
+        if (existsSync(configPath)) {
+            const tmp = readFileSync(configPath, { encoding: "utf-8" })
+            pageData = JSON.parse(tmp)
+        } else {
+            _console.fatal(`Page entry: ${entry.value}, its config (config.json) cannot be found, please check!`)
+        }
+        const generatedHtml = fetchTemplateHTML(entry, pageData)
+        if (existsSync(entry.abs + entry.__options.templateName)) {
+            let fileContent = readFileSync(entry.abs + entry.__options.templateName, { encoding: "utf-8" });
+            if(!fileContent.startsWith(GENERATED_FLAG)) {
+                _console.warn(`There is a same named HTML file (${entry.__options.templateName}) already exist in entry '${entry.value}', template generation skipped`)
+                return;
+            }
+        }
+        // writeFileSync(entry.abs + entry.__options.templateName, generatedHtml, {
+        //     encoding: "utf-8",
+        // });
+        virtualMap.set(entry.abs + entry.__options.templateName, generatedHtml);
+    })
+    return virtualMap;
 }
 
 export function cleanTempEntries(
