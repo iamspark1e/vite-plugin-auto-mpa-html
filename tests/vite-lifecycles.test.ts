@@ -79,6 +79,10 @@ describe("Test plugin's lifecycle - buildStart", () => {
             `<title><%= title %></title>`
         ); // correctly render ejs template with given data
     });
+
+    afterAll(() => {
+        cleanTempEntries(entries.entries);
+    })
 });
 
 describe("Test plugin's lifecycle - buildStart (with incorrect configuration)", () => {
@@ -109,7 +113,7 @@ describe("Test plugin's lifecycle - buildStart (with experimental feature)", () 
             enableDevDirectory: false,
             entryName: "main.jsx",
             experimental: {
-                customTemplateName: ".html"
+                customTemplateName: ".html",
             }
         })
         prepareTempEntries(entries.entries);
@@ -121,6 +125,10 @@ describe("Test plugin's lifecycle - buildStart (with experimental feature)", () 
         if (example === undefined) return;
         expect(fs.existsSync(path.resolve(example.abs + example.__options.templateName))).toBe(true);
     });
+
+    afterAll(() => {
+        cleanTempEntries(entries.entries)
+    })
 });
 
 describe("Test plugin's lifecycle - buildEnd", () => {
@@ -144,4 +152,8 @@ describe("Test plugin's lifecycle - buildEnd", () => {
         const filePath = path.join(__dirname, "example", "src", "exist-template", "index.html");
         expect(fs.existsSync(filePath)).toBe(true); // temporary generated an entry HTML for build
     });
+
+    afterAll(() => {
+        cleanTempEntries(entries.entries)
+    })
 });
