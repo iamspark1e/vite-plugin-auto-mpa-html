@@ -131,6 +131,11 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    */
   entryName: string
   /**
+   * Config file name, after v1.1.0 you can use an ESM style exported config module, .ts is not supported yet.
+   * @default "config.json"
+   */
+  configName?: string
+  /**
    * Experimental features for plugin, using at your own risk!
    */
   experimental?: {
@@ -162,6 +167,16 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    */
   data?: object
 }
+```
+
+```javascript
+// After v1.1.0, you can use `pageConfigGenerator` to dynamically set page config.
+import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
+
+// pageConfigGenerator accepts direct cofig object, function, and even Promise.
+export default pageConfigGenerator({
+  "template": "../../template/index.html"
+})
 ```
 
 ## Limitation

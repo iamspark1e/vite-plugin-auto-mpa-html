@@ -6,7 +6,7 @@ import {
 } from "fs";
 import ejs from "ejs";
 import type { Options as EjsOptions } from "ejs";
-import { isErrorOfNotFound, PagePluginConfig, ColoringConsole } from "./types";
+import { isErrorOfNotFound, PagePluginConfig, ColoringConsole, MergedPluginOption } from "./types";
 import { EntryPath } from "./core";
 import path from "path";
 
@@ -52,6 +52,7 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
         );
     } catch (e) {
         if (!isErrorOfNotFound(e)) throw e;
+        console.log(pageConfig.template);
         _console.error(`Page entry "${entry.abs}", its template cannot be found, using default template as fallback! (${e.message})`)
         htmlContent = __defaultHTMLTemplate
     }
@@ -75,30 +76,54 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
  * @param entries {Entries}
  * @param dest {string} Output dir
  */
-export function prepareTempEntries(
-    entries: EntryPath[],
-) {
-    entries.forEach(entry => {
-        let pageData: PagePluginConfig = {}
-        const configPath = entry.abs + "/" + entry.__options.configName;
-        if (existsSync(configPath)) {
-            const tmp = readFileSync(configPath, { encoding: "utf-8" })
-            pageData = JSON.parse(tmp)
-        } else {
-            _console.fatal(`Page entry: ${entry.value}, its config (config.json) cannot be found, please check!`)
-        }
-        const generatedHtml = fetchTemplateHTML(entry, pageData)
-        if (existsSync(entry.abs + entry.__options.templateName)) {
-            let fileContent = readFileSync(entry.abs + entry.__options.templateName, { encoding: "utf-8" });
-            if(!fileContent.startsWith(GENERATED_FLAG)) {
-                _console.warn(`There is a same named HTML file (${entry.__options.templateName}) already exist in entry '${entry.value}', template generation skipped`)
-                return;
+export async function prepareSingleEntry(entry: EntryPath, pluginOption: MergedPluginOption, shouldWriteFile = true) {
+    let pageData: PagePluginConfig = {}
+    const configPath = entry.abs + "/" + entry.__options.configName;
+    if (!existsSync(configPath)) {
+        _console.fatal(`Page entry: ${entry.value}, its config (${entry.__options.configName}) cannot be found, please check!`)
+        return;
+    }
+    if (entry.__options.configName.endsWith('.json')) {
+        const tmp = readFileSync(configPath, { encoding: "utf-8" })
+        pageData = JSON.parse(tmp)
+    } else if (entry.__options.configName.endsWith('.js')) {
+        let config = await import(configPath).catch(e => {
+            _console.fatal(e.message);
+        })
+        if(config && config.default) {
+            if(typeof config.default == "function") {
+                pageData = await config.default(pluginOption)
+            } else {
+                pageData = config.default
             }
+        } else {
+            _console.fatal(`config file ${configPath} cannot be parsed and imported, maybe forgot exporting default?`)
         }
+    } else {
+        _console.fatal(`using ${entry.__options.configName} as page config is not supported yet`)
+    }
+    const generatedHtml = fetchTemplateHTML(entry, pageData)
+    if (existsSync(entry.abs + entry.__options.templateName)) {
+        let fileContent = readFileSync(entry.abs + entry.__options.templateName, { encoding: "utf-8" });
+        if (!fileContent.startsWith(GENERATED_FLAG)) {
+            _console.warn(`There is a same named HTML file (${entry.__options.templateName}) already exist in entry '${entry.value}', template generation skipped`)
+            return;
+        }
+    }
+    if (shouldWriteFile) {
         writeFileSync(entry.abs + entry.__options.templateName, generatedHtml, {
             encoding: "utf-8",
         });
-    })
+    }
+    return pageData;
+}
+export async function prepareTempEntries(
+    entries: EntryPath[],
+    pluginOption: MergedPluginOption
+) {
+    await Promise.all(entries.map(async entry => {
+        await prepareSingleEntry(entry, pluginOption);
+    }));
 }
 
 export function cleanTempEntries(

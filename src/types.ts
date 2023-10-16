@@ -2,6 +2,7 @@ import type { Options as EjsOption } from "ejs";
 
 export type PluginOption = {
     entryName?: string;                 // default:main.js
+    configName?: string;                // default:config.json
     ejsOption?: EjsOption;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
@@ -15,6 +16,7 @@ export type ExperimentalPluginOption = {
 
 export type MergedPluginOption = {
     entryName: string;                 // default:main.js
+    configName: string;
     ejsOption?: EjsOption;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
@@ -23,6 +25,7 @@ export type MergedPluginOption = {
 
 export const defaultPluginOption = {
     entryName: "main.js",
+    configName: "config.json",
     enableDevDirectory: true,
     experimental: {}
 }

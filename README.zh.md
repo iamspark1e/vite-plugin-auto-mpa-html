@@ -130,6 +130,11 @@ export default defineConfig({
    */
   entryName: string
   /**
+   * 配置文件名，在版本v1.1.0后，你可以使用js导出一个es module来配置页面，TS暂不支持.
+   * @default "config.json"
+   */
+  configName?: string
+  /**
    * 测试特性，键值可能会在版本更新时有改动，请注意！
    */
   experimental?: {
@@ -163,6 +168,16 @@ export default defineConfig({
    */
   data?: object
 }
+```
+
+```javascript
+// After v1.1.0, you can use `pageConfigGenerator` to dynamically set page config.
+import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
+
+// pageConfigGenerator accepts direct cofig object, function, and even Promise.
+export default pageConfigGenerator({
+  "template": "../../template/index.html"
+})
 ```
 
 ## 局限

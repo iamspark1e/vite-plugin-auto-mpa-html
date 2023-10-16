@@ -3,7 +3,7 @@ import { MergedPluginOption, PagePluginConfig } from "./types.js"
 import type { Connect, ViteDevServer } from "vite";
 import { IncomingMessage, ServerResponse } from "http";
 import Entries, { EntryPath } from './core.js'
-import { fetchTemplateHTML } from "./template.js"
+import { fetchTemplateHTML, prepareSingleEntry } from "./template.js"
 import { existsSync, readFileSync } from 'fs';
 
 export function genDirectory(entries: Entries) {
@@ -49,7 +49,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     let foundedEntry: EntryPath | undefined;
     if (opt.experimental?.customTemplateName === '.html') {
       let matchedFolder = fileUrl.match(/\/(.*).html/)
-      if(!matchedFolder || !matchedFolder[1]) {
+      if (!matchedFolder || !matchedFolder[1]) {
         throw new Error(`Could not match the entry module (${fileUrl}) in experimental.customTemplateName mode, please check.`)
       }
       let dirname = matchedFolder[1];
@@ -58,7 +58,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
         return false;
       })
     } else {
-      if(opt.experimental?.customTemplateName && !fileUrl.endsWith(opt.experimental.customTemplateName)) return next();
+      if (opt.experimental?.customTemplateName && !fileUrl.endsWith(opt.experimental.customTemplateName)) return next();
       dirname = path.dirname(fileUrl);
       foundedEntry = entries.entries.find(entry => {
         if ((dirname === "/" && entry.value === ".") || ("/" + entry.value === dirname)) {
@@ -71,8 +71,13 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     const configUrl = foundedEntry.abs + "/" + foundedEntry.__options.configName
     // render as normal when no config file detected.
     if (!existsSync(configUrl)) return next();
-    const temp = readFileSync(configUrl, { encoding: "utf-8" });
-    const pageConfig: PagePluginConfig = JSON.parse(temp);
+    // const temp = readFileSync(configUrl, { encoding: "utf-8" });
+    // const pageConfig: PagePluginConfig = JSON.parse(temp);
+    const pageConfig = await prepareSingleEntry(foundedEntry, opt, false).catch(e => {
+      console.log(e.message);
+      return next();
+    });
+    if (!pageConfig) return next();
     let generatedHtml = fetchTemplateHTML(foundedEntry, pageConfig)
     generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
     res.end(generatedHtml);
