@@ -48,7 +48,7 @@ export default class Entries {
                 value: dirname,
                 abs: path.resolve(rootDir, dirname),
                 __options: {
-                    configName: this.configName,
+                    configName: pluginOption.configName || this.configName,
                     templateName: this.templateName,
                     entryName: this.entryName,
                     sharedData: pluginOption.sharedData,

@@ -23,7 +23,7 @@ describe("Test plugin's lifecycle - buildStart", () => {
         entries = new Entries({
             root: "tests/example/src"
         }, pluginOption)
-        prepareTempEntries(entries.entries);
+        prepareTempEntries(entries.entries, pluginOption);
     })
 
     it("common project struct, should use user defined template", () => {
@@ -79,6 +79,10 @@ describe("Test plugin's lifecycle - buildStart", () => {
             `<title><%= title %></title>`
         ); // correctly render ejs template with given data
     });
+
+    afterAll(() => {
+        cleanTempEntries(entries.entries);
+    })
 });
 
 describe("Test plugin's lifecycle - buildStart (with incorrect configuration)", () => {
@@ -86,9 +90,9 @@ describe("Test plugin's lifecycle - buildStart (with incorrect configuration)", 
         root: "tests/failure/src"
     }, pluginOption)
 
-    it("no config.json detect, will break build progress", () => {
+    it("no config.json detect, will break build progress", async () => {
         try {
-            prepareTempEntries(entries.entries);
+            await prepareTempEntries(entries.entries, pluginOption);
         } catch (e) {
             expect(e).toBeInstanceOf(PluginCustomizedError)
             expect(e.message).toBe("[vite-plugin-auto-mpa-html]: Page entry: no-config, its config (config.json) cannot be found, please check!")
@@ -102,17 +106,18 @@ describe("Test plugin's lifecycle - buildStart (with incorrect configuration)", 
 
 describe("Test plugin's lifecycle - buildStart (with experimental feature)", () => {
     let entries: Entries;
-    beforeAll(() => {
+    const pluginOpt: MergedPluginOption = {
+        enableDevDirectory: false,
+        entryName: "main.jsx",
+        experimental: {
+            customTemplateName: ".html",
+        }
+    }
+    beforeAll(async () => {
         entries = new Entries({
             root: "tests/example/src"
-        }, {
-            enableDevDirectory: false,
-            entryName: "main.jsx",
-            experimental: {
-                customTemplateName: ".html"
-            }
-        })
-        prepareTempEntries(entries.entries);
+        }, pluginOpt)
+        await prepareTempEntries(entries.entries, pluginOpt);
     })
 
     it("temporary entries should be generated with experimental features", () => {
@@ -121,6 +126,10 @@ describe("Test plugin's lifecycle - buildStart (with experimental feature)", () 
         if (example === undefined) return;
         expect(fs.existsSync(path.resolve(example.abs + example.__options.templateName))).toBe(true);
     });
+
+    afterAll(() => {
+        cleanTempEntries(entries.entries)
+    })
 });
 
 describe("Test plugin's lifecycle - buildEnd", () => {
@@ -144,4 +153,8 @@ describe("Test plugin's lifecycle - buildEnd", () => {
         const filePath = path.join(__dirname, "example", "src", "exist-template", "index.html");
         expect(fs.existsSync(filePath)).toBe(true); // temporary generated an entry HTML for build
     });
+
+    afterAll(() => {
+        cleanTempEntries(entries.entries)
+    })
 });

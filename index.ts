@@ -3,7 +3,7 @@
 import { MergedPluginOption, defaultPluginOption, ColoringConsole } from './src/types.js'
 import { cleanTempEntries, prepareTempEntries, prepareVirtualTempEntries } from './src/template.js'
 import Entries from './src/core.js'
-import type { PluginOption } from './src/types.js'
+import type { PluginOption, PagePluginConfig } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
 import { devServerMiddleware } from './src/dev-middleware.js'
 
@@ -25,26 +25,13 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             cmd = command;
             return true;
         },
-        resolveId: (id, importer) => {
-            if(id.startsWith(PREFIX)) {
-                return id;
-            }
-        },
-        load: (id) => {
-            if(id.startsWith(PREFIX)) {
-                console.log("detect \0")
-                const idNoPrefix = id.slice(PREFIX.length);
-                return virtualMap.get(idNoPrefix);
-            }
-        },
-        buildStart: () => {
-            if(cmd !== 'serve') {
-                // prepareTempEntries(entries.entries)
-                virtualMap = prepareVirtualTempEntries(entries.entries);
-            }
+        buildStart: async () => {
+            if (cmd !== 'serve') await prepareTempEntries(entries.entries, opt).catch(e => {
+                _console.fatal(e.message);
+            })
         },
         buildEnd: () => {
-            if(cmd !== 'serve') cleanTempEntries(entries.entries)
+            if (cmd !== 'serve') cleanTempEntries(entries.entries)
         },
         configureServer: (server) => {
             server.middlewares.use(devServerMiddleware(entries, opt, server))
@@ -52,7 +39,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;
         },
-        config: (config: UserConfig, _env: { mode: string, command: string }) => {
+        config: (config: UserConfig, _env: { mode: string, command: string }): UserConfig => {
             entries = new Entries(config, opt)
             console.log("dev mode 1")
             if (entries.entries.length === 0) {
@@ -62,8 +49,8 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             entries.entries.forEach(entry => {
                 let entryName = entry.value;
                 if (entryName === "" || entryName === ".") {
-                    if(opt.experimental?.customTemplateName === ".html") {
-                        _console.fatal("When `customTemplateName`'s value is \".html\", it's not able to put entry files directly under root dir (To prevent pollute files outside the `dist` option). Please resolve this conflict first!");
+                    if (opt.experimental?.customTemplateName === ".html") {
+                        _console.fatal("When `customTemplateName`'s value is \".html\", it's not able to put entry files directly under root dir (To prevent pollute files outside the `dist` option). Please resolve this conflict first!")
                     } else {
                         entryName = opt.experimental?.rootEntryDistName || "_root";
                     }
@@ -71,15 +58,37 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                 // input[entryName] = entry.abs + entry.__options.templateName
                 input[entryName] = PREFIX + entry.abs + entry.__options.templateName
             })
-            return {
+
+            let generatedConfig: UserConfig = {
                 build: {
                     rollupOptions: {
                         input
                     }
                 }
             }
+
+            if(_env.command === "serve") {
+                generatedConfig.optimizeDeps = {
+                    entries: Object.keys(input)
+                }
+            }
+
+            return generatedConfig;
         },
     }
+}
+
+type PageConfigFn = (pluginOpt: MergedPluginOption) => PagePluginConfig
+type PageAsyncConfigFn = (pluginOpt: MergedPluginOption) => Promise<PagePluginConfig>
+type PageConfigGeneratorTypeExport =
+    PagePluginConfig |
+    PageConfigFn |
+    PageAsyncConfigFn
+export function pageConfigGenerator(opt: PagePluginConfig): PagePluginConfig
+export function pageConfigGenerator(opt: PageConfigFn): PageConfigFn
+export function pageConfigGenerator(opt: PageAsyncConfigFn): PageAsyncConfigFn
+export function pageConfigGenerator(opt: PageConfigGeneratorTypeExport): PageConfigGeneratorTypeExport {
+    return opt
 }
 
 export default autoMpaHTMLPlugin;
