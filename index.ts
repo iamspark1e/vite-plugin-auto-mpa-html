@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// import { devServerMiddleware } from './src/dev-middleware.js'
 import { MergedPluginOption, defaultPluginOption, ColoringConsole } from './src/types.js'
-import { cleanTempEntries, prepareTempEntries, prepareVirtualTempEntries } from './src/template.js'
+import { cleanTempEntries, prepareTempEntries, prepareVirtualEntries } from './src/template.js'
 import Entries from './src/core.js'
 import type { PluginOption, PagePluginConfig } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
 import { devServerMiddleware } from './src/dev-middleware.js'
+import path from 'path'
 
 function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     let config: ResolvedConfig;
@@ -25,10 +25,25 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             cmd = command;
             return true;
         },
+        resolveId: (id) => {
+            return id.startsWith(PREFIX)
+                /**
+                 * Entry paths here must be absolute, otherwise it may cause problem on Windows. Closes #43
+                 * @see https://github.com/vitejs/vite/issues/9771
+                 */
+                ? path.resolve(config.root, id.slice(PREFIX.length))
+                : undefined;
+        },
+        load: (id) => {
+            return virtualMap.get(id)
+        },
         buildStart: async () => {
-            if (cmd !== 'serve') await prepareTempEntries(entries.entries, opt).catch(e => {
-                _console.fatal(e.message);
-            })
+            // if (cmd !== 'serve') await prepareTempEntries(entries.entries, opt).catch(e => {
+            //     _console.fatal(e.message);
+            // })
+            if (cmd !== 'serve') {
+                virtualMap = await prepareVirtualEntries(entries.entries, opt)
+            }
         },
         buildEnd: () => {
             if (cmd !== 'serve') cleanTempEntries(entries.entries)
@@ -41,7 +56,6 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         },
         config: (config: UserConfig, _env: { mode: string, command: string }): UserConfig => {
             entries = new Entries(config, opt)
-            console.log("dev mode 1")
             if (entries.entries.length === 0) {
                 _console.fatal("0 entry detected! Please check plugin's option in Vite config file.")
             }
@@ -67,7 +81,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                 }
             }
 
-            if(_env.command === "serve") {
+            if (_env.command === "serve") {
                 generatedConfig.optimizeDeps = {
                     entries: Object.keys(input)
                 }

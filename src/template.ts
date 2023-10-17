@@ -127,34 +127,86 @@ export async function prepareTempEntries(
     }));
 }
 
-export function prepareVirtualTempEntries(
+/**
+ * generate entries for `rollupOptions.build.input`
+ * @param entries {Entries}
+ * @param dest {string} Output dir
+ */
+export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: MergedPluginOption) {
+    let pageData: PagePluginConfig = {}
+    const configPath = entry.abs + "/" + entry.__options.configName;
+    if (!existsSync(configPath)) {
+        _console.fatal(`Page entry: ${entry.value}, its config (${entry.__options.configName}) cannot be found, please check!`)
+    }
+    if (entry.__options.configName.endsWith('.json')) {
+        const tmp = readFileSync(configPath, { encoding: "utf-8" })
+        pageData = JSON.parse(tmp)
+    } else if (entry.__options.configName.endsWith('.js')) {
+        let config = await import(configPath).catch(e => {
+            _console.fatal(e.message);
+        })
+        if(config && config.default) {
+            if(typeof config.default == "function") {
+                pageData = await config.default(pluginOption)
+            } else {
+                pageData = config.default
+            }
+        } else {
+            _console.fatal(`config file ${configPath} cannot be parsed and imported, maybe forgot exporting default?`)
+        }
+    } else {
+        _console.fatal(`using ${entry.__options.configName} as page config is not supported yet`)
+    }
+    const generatedHtml = fetchTemplateHTML(entry, pageData)
+    if (existsSync(entry.abs + entry.__options.templateName)) {
+        let fileContent = readFileSync(entry.abs + entry.__options.templateName, { encoding: "utf-8" });
+        if (!fileContent.startsWith(GENERATED_FLAG)) {
+            _console.warn(`There is a same named HTML file (${entry.__options.templateName}) already exist in entry '${entry.value}', template generation skipped`)
+            return "";
+        }
+    }
+    return generatedHtml;
+}
+export async function prepareVirtualEntries(
     entries: EntryPath[],
+    pluginOption: MergedPluginOption
 ) {
     let virtualMap = new Map<string, string>();
-    entries.forEach(entry => {
-        let pageData: PagePluginConfig = {}
-        const configPath = entry.abs + "/" + entry.__options.configName;
-        if (existsSync(configPath)) {
-            const tmp = readFileSync(configPath, { encoding: "utf-8" })
-            pageData = JSON.parse(tmp)
-        } else {
-            _console.fatal(`Page entry: ${entry.value}, its config (config.json) cannot be found, please check!`)
-        }
-        const generatedHtml = fetchTemplateHTML(entry, pageData)
-        if (existsSync(entry.abs + entry.__options.templateName)) {
-            let fileContent = readFileSync(entry.abs + entry.__options.templateName, { encoding: "utf-8" });
-            if(!fileContent.startsWith(GENERATED_FLAG)) {
-                _console.warn(`There is a same named HTML file (${entry.__options.templateName}) already exist in entry '${entry.value}', template generation skipped`)
-                return;
-            }
-        }
-        // writeFileSync(entry.abs + entry.__options.templateName, generatedHtml, {
-        //     encoding: "utf-8",
-        // });
+    await Promise.all(entries.map(async entry => {
+        let generatedHtml = await prepareSingleVirtualEntry(entry, pluginOption);
         virtualMap.set(entry.abs + entry.__options.templateName, generatedHtml);
-    })
+    }));
     return virtualMap;
 }
+
+// export function prepareVirtualTempEntries(
+//     entries: EntryPath[],
+// ) {
+//     let virtualMap = new Map<string, string>();
+//     entries.forEach(entry => {
+//         let pageData: PagePluginConfig = {}
+//         const configPath = entry.abs + "/" + entry.__options.configName;
+//         if (existsSync(configPath)) {
+//             const tmp = readFileSync(configPath, { encoding: "utf-8" })
+//             pageData = JSON.parse(tmp)
+//         } else {
+//             _console.fatal(`Page entry: ${entry.value}, its config (config.json) cannot be found, please check!`)
+//         }
+//         const generatedHtml = fetchTemplateHTML(entry, pageData)
+//         if (existsSync(entry.abs + entry.__options.templateName)) {
+//             let fileContent = readFileSync(entry.abs + entry.__options.templateName, { encoding: "utf-8" });
+//             if(!fileContent.startsWith(GENERATED_FLAG)) {
+//                 _console.warn(`There is a same named HTML file (${entry.__options.templateName}) already exist in entry '${entry.value}', template generation skipped`)
+//                 return;
+//             }
+//         }
+//         // writeFileSync(entry.abs + entry.__options.templateName, generatedHtml, {
+//         //     encoding: "utf-8",
+//         // });
+//         virtualMap.set(entry.abs + entry.__options.templateName, generatedHtml);
+//     })
+//     return virtualMap;
+// }
 
 export function cleanTempEntries(
     entries: EntryPath[],
