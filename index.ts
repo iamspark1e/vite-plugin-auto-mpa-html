@@ -35,7 +35,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                 : undefined;
         },
         load: (id) => {
-            return virtualMap.get(id)
+            if (cmd !== 'serve') return virtualMap.get(id)
         },
         buildStart: async () => {
             // if (cmd !== 'serve') await prepareTempEntries(entries.entries, opt).catch(e => {
