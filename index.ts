@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { MergedPluginOption, defaultPluginOption, ColoringConsole } from './src/types.js'
-import { cleanTempEntries, prepareTempEntries, prepareVirtualEntries } from './src/template.js'
+import { cleanTempEntries, prepareVirtualEntries } from './src/template.js'
 import Entries from './src/core.js'
 import type { PluginOption, PagePluginConfig } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
@@ -38,9 +38,6 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             if (cmd !== 'serve') return virtualMap.get(id)
         },
         buildStart: async () => {
-            // if (cmd !== 'serve') await prepareTempEntries(entries.entries, opt).catch(e => {
-            //     _console.fatal(e.message);
-            // })
             if (cmd !== 'serve') {
                 virtualMap = await prepareVirtualEntries(entries.entries, opt)
             }
