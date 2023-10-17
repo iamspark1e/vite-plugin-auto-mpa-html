@@ -1,10 +1,10 @@
 import path from 'path'
-import { MergedPluginOption, PagePluginConfig } from "./types.js"
+import { MergedPluginOption } from "./types.js"
 import type { Connect, ViteDevServer } from "vite";
 import { IncomingMessage, ServerResponse } from "http";
 import Entries, { EntryPath } from './core.js'
 import { fetchTemplateHTML, prepareSingleEntry } from "./template.js"
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 
 export function genDirectory(entries: Entries) {
   const input: { [key: string]: string } = {}

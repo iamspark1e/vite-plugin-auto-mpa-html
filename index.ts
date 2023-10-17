@@ -37,7 +37,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;
         },
-        config: (config: UserConfig, _env: { mode: string, command: string }) => {
+        config: (config: UserConfig, _env: { mode: string, command: string }): UserConfig => {
             entries = new Entries(config, opt)
             if (entries.entries.length === 0) {
                 _console.fatal("0 entry detected! Please check plugin's option in Vite config file.")
@@ -55,13 +55,21 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                 input[entryName] = entry.abs + entry.__options.templateName
             })
 
-            return {
+            let generatedConfig: UserConfig = {
                 build: {
                     rollupOptions: {
                         input
                     },
                 }
             }
+
+            if(_env.command === "serve") {
+                generatedConfig.optimizeDeps = {
+                    entries: Object.keys(input)
+                }
+            }
+
+            return generatedConfig;
         },
     }
 }
