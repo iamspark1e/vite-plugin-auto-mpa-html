@@ -1,3 +1,22 @@
+# [1.1.0-alpha.4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.3...v1.1.0-alpha.4) (2023-10-17)
+
+
+### Bug Fixes
+
+* add `entry.__options.templateName` judgement for adaption of `PluginOption.expereimental.customTemplateName` using `.html` ([dcd8955](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/dcd89553fe99ffc9fa6594d596edea3d9a9517e1))
+* path related resources cross-platform problem ([eaea7a7](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/eaea7a70bf5ba433df4e8cc4e6843a050c1b953c))
+* remove prepareTempEntries related functions ([fa01e0e](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/fa01e0e40dce484ed72cf64d53bcd16622d1d1f5))
+* **test:** unit tests, unplug vite-lifecycles test due to prepareTempEntries is removed ([086bd4a](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/086bd4a39f3aeeab1d794aa294afb5fcaa7c3f90))
+* virtual entries only avaliable in `build` command ([983ee71](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/983ee71e1c4a6227ed11457102078d09ec7f820a))
+
+
+### Features
+
+* trying to make entry html virtual, but vite:build-html plugin could not resolve virtual entry format, received incorrect relative path ([d827f2d](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/d827f2d644e9bb2300cd5c8fca98c827cb36e5c3))
+* using virtual template instead of `writeFile` ([5509baa](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/5509baa6d55b709f9eeb31ea1270dceb4f6accc9))
+
+
+
 # [1.1.0-alpha.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2023-10-17)
 
 
