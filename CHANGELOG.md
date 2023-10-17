@@ -1,3 +1,12 @@
+# [1.1.0-alpha.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2023-10-17)
+
+
+### Bug Fixes
+
+* auto generate `optimizeDeps.entries` when command is `serve`, close https://github.com/iamspark1e/vite-plugin-auto-mpa-html/issues/16 ([3a7a345](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/3a7a34505067f46dcd85e5af1439dcc0a0999ed5))
+
+
+
 # [1.1.0-alpha.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2023-10-17)
 
 
