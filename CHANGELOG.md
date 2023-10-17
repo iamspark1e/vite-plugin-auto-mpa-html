@@ -1,3 +1,12 @@
+# [1.1.0-alpha.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2023-10-17)
+
+
+### Features
+
+* add `pageConfigGenerator` so you can use pluginOptions even in page config ([1648493](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/16484936c5f5ebdf41fbdc68b646cec869ee77fc))
+
+
+
 # [1.1.0-alpha.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.0...v1.1.0-alpha.1) (2023-10-07)
 
 
