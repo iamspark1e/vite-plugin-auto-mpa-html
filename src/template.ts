@@ -168,7 +168,7 @@ export async function prepareVirtualEntries(
 ) {
     let virtualMap = new Map<string, string>();
     await Promise.all(entries.map(async entry => {
-        let tplPath = path.join(entry.abs, entry.__options.templateName)
+        let tplPath = entry.__options.templateName.startsWith(".") ? (entry.abs + entry.__options.templateName) : path.join(entry.abs, entry.__options.templateName);
         let generatedHtml = await prepareSingleVirtualEntry(entry, pluginOption);
         virtualMap.set(tplPath, generatedHtml);
     }));
