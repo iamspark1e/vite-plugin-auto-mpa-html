@@ -3,7 +3,7 @@ import { MergedPluginOption } from "./types.js"
 import type { Connect, ViteDevServer } from "vite";
 import { IncomingMessage, ServerResponse } from "http";
 import Entries, { EntryPath } from './core.js'
-import { fetchTemplateHTML, prepareSingleEntry } from "./template.js"
+import { prepareSingleVirtualEntry } from "./template.js"
 import { existsSync } from 'fs';
 
 export function genDirectory(entries: Entries) {
@@ -73,12 +73,18 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     if (!existsSync(configUrl)) return next();
     // const temp = readFileSync(configUrl, { encoding: "utf-8" });
     // const pageConfig: PagePluginConfig = JSON.parse(temp);
-    const pageConfig = await prepareSingleEntry(foundedEntry, opt, false).catch(e => {
+    // const pageConfig = await prepareSingleEntry(foundedEntry, opt, false).catch(e => {
+    //   console.log(e.message);
+    //   return next();
+    // });
+    // if (!pageConfig) return next();
+    // let generatedHtml = fetchTemplateHTML(foundedEntry, pageConfig)
+    // generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
+    let generatedHtml = await prepareSingleVirtualEntry(foundedEntry, opt).catch(e => {
       console.log(e.message);
       return next();
-    });
-    if (!pageConfig) return next();
-    let generatedHtml = fetchTemplateHTML(foundedEntry, pageConfig)
+    })
+    if(!generatedHtml) return next();
     generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
     res.end(generatedHtml);
   };

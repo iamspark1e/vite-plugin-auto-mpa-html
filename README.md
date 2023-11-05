@@ -4,7 +4,7 @@
   <a href="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html" ><img src="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html/branch/main/graph/badge.svg?token=xW4J4R4P7b"/></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/v/vite-plugin-auto-mpa-html" /></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/dm/vite-plugin-auto-mpa-html" /></a>
-  <img src="https://img.shields.io/badge/Vite-%5E2.9.15%7C%5E3.2.3%7C4-brightgreen" />
+  <img src="https://img.shields.io/badge/Vite-%5E2.9.15%7C%5E3.2.3%7C4%7C5-brightgreen" />
 </p>
 
 <p align='center'>English | <a href="./README.zh.md">中文文档</a></p>
