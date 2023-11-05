@@ -1,3 +1,7 @@
+# [1.1.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.4...v1.1.0) (2023-11-05)
+
+
+
 # [1.1.0-alpha.4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.3...v1.1.0-alpha.4) (2023-10-17)
 
 
