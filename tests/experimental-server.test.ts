@@ -44,10 +44,12 @@ describe("Test plugin's lifecycle - devServer (experimental mode)", async () => 
 
   it("devMiddleware should block HTML requests and replace with rendered", async () => {
     const res = await request(tmp).get("/subdir.html");
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>"); // this page is using `templates/tpl.html` as template, without title prerender.
+  });
+
+  it("devMiddleware should correctly handle HTML requests with search params", async () => {
+    const res = await request(tmp).get("/subdir.html?n=100");
     expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
-    // expect(res.text).toMatch(
-    //   `<script type="module" src="./subdir/${pluginOption.entryName}"></script>`
-    // );
   });
 
   it("devMiddleware should not block html if exist in public folder", async () => {

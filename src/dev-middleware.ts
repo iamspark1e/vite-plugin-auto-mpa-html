@@ -39,7 +39,8 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     res: ServerResponse<IncomingMessage>,
     next: Connect.NextFunction
   ) => {
-    const fileUrl = req.url || "";
+    let fileUrl = req.url || "";
+    if (fileUrl.includes("?")) fileUrl = fileUrl.split("?")[0];
     if (!fileUrl.endsWith(".html") && fileUrl !== "/") return next();
     if (opt.enableDevDirectory && fileUrl.endsWith("/")) {
       res.end(genDirectory(entries));
@@ -84,7 +85,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
       console.log(e.message);
       return next();
     })
-    if(!generatedHtml) return next();
+    if (!generatedHtml) return next();
     generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
     res.end(generatedHtml);
   };
