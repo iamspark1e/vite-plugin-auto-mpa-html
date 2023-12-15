@@ -1,3 +1,12 @@
+# [1.1.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.3...v1.1.0) (2023-12-15)
+
+
+### Bug Fixes
+
+* dev server can correctly recognize url search params now ([1eaa683](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/1eaa68307dafd0961d9e548e6541c371ac04a188))
+
+
+
 # [1.1.0-alpha.4](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.3...v1.1.0-alpha.4) (2023-10-17)
 
 
