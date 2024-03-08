@@ -179,6 +179,23 @@ export default pageConfigGenerator({
 })
 ```
 
+### Conditional page configuration
+
+We have an option called `sharedData` cross pages, so you can inject the variables you need, then read them in page's config (or directly use in ejs templates), like this,
+
+```javascript
+// `pageConfigGenerator` is not required, but it can provide TypeScript reference.
+export default function(opt) { // Or even promise function
+  console.log(opt.sharedData);
+  return {
+    "template": "../template/index.html",
+    data: {
+      isProd: opt.sharedData.isProd
+    }
+  }
+}
+```
+
 ## Limitation
 
 - Nested folder is __SUPPORTED__ from v1, but will generate a temporary `index.html` besides your entry file.
@@ -186,6 +203,16 @@ export default pageConfigGenerator({
 - Env files is only supported in root folder (same level as `vite.config.js`), env-per-entry is __NOT SUPPORTED__.
 
 - When `experimental.customTemplateName` equals ".html" (which means you want to reduce folder levels), it's NOT allowed to put entry files directly under root folder.
+
+- Auto restart when page's config changed is not originally supported by this plugin, but you can use [vite-plugin-restart]() which is maintained by @antfu, and add config like this,
+
+```javascript
+ViteRestart({
+  restart: [
+    'config.[jt]s', // your configuration file name
+  ]
+})
+```
 
 ## Vite native features
 
