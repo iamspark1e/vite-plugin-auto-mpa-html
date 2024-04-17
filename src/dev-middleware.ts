@@ -1,5 +1,5 @@
 import path from 'path'
-import { MergedPluginOption } from "./types.js"
+import { MergedPluginOption, ColoringConsole } from "./types.js"
 import type { Connect, ViteDevServer } from "vite";
 import { IncomingMessage, ServerResponse } from "http";
 import Entries, { EntryPath } from './core.js'
@@ -39,6 +39,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     res: ServerResponse<IncomingMessage>,
     next: Connect.NextFunction
   ) => {
+    const _console = new ColoringConsole(1);
     let fileUrl = req.url || "";
     if (fileUrl.includes("?")) fileUrl = fileUrl.split("?")[0];
     if (!fileUrl.endsWith(".html") && fileUrl !== "/") return next();
@@ -71,16 +72,11 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     if (!foundedEntry) return next();
     const configUrl = foundedEntry.abs + "/" + foundedEntry.__options.configName
     // render as normal when no config file detected.
-    if (!existsSync(configUrl)) return next();
-    // const temp = readFileSync(configUrl, { encoding: "utf-8" });
-    // const pageConfig: PagePluginConfig = JSON.parse(temp);
-    // const pageConfig = await prepareSingleEntry(foundedEntry, opt, false).catch(e => {
-    //   console.log(e.message);
-    //   return next();
-    // });
-    // if (!pageConfig) return next();
-    // let generatedHtml = fetchTemplateHTML(foundedEntry, pageConfig)
-    // generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
+    if (!existsSync(configUrl)) {
+      // the founded entry exist but the config file cannot be found, add an alert in console
+      _console.error(`[devServer] The configuration file: ${configUrl} cannot be found, please check!`);
+      return next();
+    }
     let generatedHtml = await prepareSingleVirtualEntry(foundedEntry, opt).catch(e => {
       console.log(e.message);
       return next();
