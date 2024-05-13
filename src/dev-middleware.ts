@@ -44,6 +44,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     if (fileUrl.includes("?")) fileUrl = fileUrl.split("?")[0];
     if (!fileUrl.endsWith(".html") && fileUrl !== "/") return next();
     if (opt.enableDevDirectory && fileUrl.endsWith("/")) {
+      res.setHeader("Content-Type", "text/html");
       res.end(genDirectory(entries));
       return;
     }
@@ -82,7 +83,8 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
       return next();
     })
     if (!generatedHtml) return next();
-    generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml)
+    generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml);
+    res.setHeader("Content-Type", "text/html");
     res.end(generatedHtml);
   };
 }
