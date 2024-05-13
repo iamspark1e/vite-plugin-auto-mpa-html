@@ -1,3 +1,13 @@
+## [1.1.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.1...v1.1.2) (2024-05-13)
+
+
+### Bug Fixes
+
+* Add `Content-Type` header when the development server returns HTML to avoid returning it is being treated as text ([f6ec180](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/f6ec18066c4c5f291fbbf116a7a3166d8f662bca))
+* add friendly log if the `configName` file is incorrect on dev server ([dc0c004](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/dc0c0045899b7aeadfc715b093a0f81b6fb6c9f7))
+
+
+
 ## [1.1.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.0-alpha.3...v1.1.1) (2023-12-15)
 
 
