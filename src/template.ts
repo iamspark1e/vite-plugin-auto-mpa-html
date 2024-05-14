@@ -2,7 +2,6 @@ import {
     existsSync,
     readFileSync,
     unlinkSync,
-    writeFileSync,
 } from "fs";
 import ejs from "ejs";
 import type { Options as EjsOptions } from "ejs";
@@ -74,7 +73,7 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
 }
 
 /**
- * generate entries for `rollupOptions.build.input`
+ * [DEPRECATED] generate entries for `rollupOptions.build.input`
  * @param entries {Entries}
  * @param dest {string} Output dir
  */

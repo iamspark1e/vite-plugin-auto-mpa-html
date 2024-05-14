@@ -39,8 +39,6 @@ export default class Entries {
         this.entryName = pluginOption.entryName;
         const rootDir = config.root || "";
         const globPath = `**/${this.entryName}`
-        // (\/|\\\\) posix/darwin adaption
-        // const pathDir = "(/|\\\\)(.*?)(/|\\\\)";
         const files = globSync(globPath, {cwd: rootDir, ignore: 'node_modules/**'});
         for (let i = 0; i < files.length; i++) {
             const dirname = path.dirname(files[i]);

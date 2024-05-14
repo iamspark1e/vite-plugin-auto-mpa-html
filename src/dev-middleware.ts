@@ -7,10 +7,10 @@ import { prepareSingleVirtualEntry } from "./template.js"
 import { existsSync } from 'fs';
 
 export function genDirectory(entries: Entries) {
-  const input: { [key: string]: string } = {}
-  entries.entries.forEach(entry => {
-    input[entry.value] = entry.abs + entry.__options.templateName
-  })
+  // const input: { [key: string]: string } = {}
+  // entries.entries.forEach(entry => {
+  //   input[entry.value] = entry.abs + entry.__options.templateName
+  // })
   return `<!DOCTYPE html>
     <html lang="en">
     <head>
