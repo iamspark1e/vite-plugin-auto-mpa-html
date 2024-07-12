@@ -1,3 +1,13 @@
+## [1.1.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.2...v1.1.3) (2024-07-12)
+
+
+### Bug Fixes
+
+* remove unreachable code ([c883648](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/c883648a0262110172849e2bd45ed9988469b63b))
+* spelling correction of dev-server directory page ([2248841](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/2248841608609e38d94cebfb83fbd2d438e470a2))
+
+
+
 ## [1.1.2](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.1...v1.1.2) (2024-05-13)
 
 
