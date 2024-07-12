@@ -170,6 +170,8 @@ export default defineConfig({
 }
 ```
 
+如果你需要根据一些外部变量动态控制每一页在编译时使用的页面配置，你也可以通过修改`configName`为.js文件，并在文件中导出一个默认配置
+
 ```javascript
 // After v1.1.0, you can use `pageConfigGenerator` to dynamically set page config.
 import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
@@ -178,6 +180,29 @@ import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
 export default pageConfigGenerator({
   "template": "../../template/index.html"
 })
+```
+
+### 条件页面配置
+
+借助跨页面的选项 `sharedData` ，您可以注入所需的变量，然后在页面配置中读取它们（或直接在 ejs 模板中使用），例如：
+
+```javascript
+import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
+
+// `pageConfigGenerator` is not required, but it can provide TypeScript reference.
+export default pageConfigGenerator((opt) => {
+  console.log(opt.sharedData);
+  return {
+    "template": "../template/index.html",
+    data: {
+      isProd: opt.sharedData.isProd
+    }
+  }
+})
+
+// 如果你更喜欢使用JSDoc的方式，你也可以像下面一样引入类型，这样可以不导入`pageConfigGenerator`
+/** @type {import('vite-plugin-auto-mpa-html').PageConfigGeneratorTypeExport} */
+/** @param {import('vite-plugin-auto-mpa-html').PageConfigOption} opt  */
 ```
 
 ## 局限

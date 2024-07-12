@@ -169,6 +169,8 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
 }
 ```
 
+If you need to dynamically control the page configuration used during compilation for each page based on some external variables, you can also modify the `configName` to a ".js" file and export a default configuration in the file.
+
 ```javascript
 // After v1.1.0, you can use `pageConfigGenerator` to dynamically set page config.
 import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
@@ -184,8 +186,10 @@ export default pageConfigGenerator({
 We have an option called `sharedData` cross pages, so you can inject the variables you need, then read them in page's config (or directly use in ejs templates), like this,
 
 ```javascript
+import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
+
 // `pageConfigGenerator` is not required, but it can provide TypeScript reference.
-export default function(opt) { // Or even promise function
+export default pageConfigGenerator((opt) => {
   console.log(opt.sharedData);
   return {
     "template": "../template/index.html",
@@ -193,7 +197,11 @@ export default function(opt) { // Or even promise function
       isProd: opt.sharedData.isProd
     }
   }
-}
+})
+
+// If you prefer to use JSDoc, you can also introduce types as shown below.
+/** @type {import('vite-plugin-auto-mpa-html').PageConfigGeneratorTypeExport} */
+/** @param {import('vite-plugin-auto-mpa-html').PageConfigOption} opt  */
 ```
 
 ## Limitation

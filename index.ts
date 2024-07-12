@@ -91,7 +91,8 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
 
 type PageConfigFn = (pluginOpt: MergedPluginOption) => PagePluginConfig
 type PageAsyncConfigFn = (pluginOpt: MergedPluginOption) => Promise<PagePluginConfig>
-type PageConfigGeneratorTypeExport =
+export type PageConfigOption = MergedPluginOption;
+export type PageConfigGeneratorTypeExport =
     PagePluginConfig |
     PageConfigFn |
     PageAsyncConfigFn
