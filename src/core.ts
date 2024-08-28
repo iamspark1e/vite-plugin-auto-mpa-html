@@ -50,7 +50,7 @@ export default class Entries {
                     templateName: this.templateName,
                     entryName: this.entryName,
                     sharedData: pluginOption.sharedData,
-                    ejsOption: pluginOption.ejsOption,
+                    ejsOption: pluginOption.renderEngineOption,
                 }
             }
             this.entries.push(fullDirname)
