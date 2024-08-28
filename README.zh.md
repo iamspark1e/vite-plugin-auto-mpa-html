@@ -9,7 +9,7 @@
 
 <p align='center'><a href="./README.md">English</a> | 中文文档</p>
 <br />
-<p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 EJS 的 HTML 模板。</p>
+<p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 LiquidJS 的 HTML 模板。</p>
 <br />
 
 ## 快速使用
@@ -31,7 +31,7 @@ export default defineConfig({
     entryName: "main.tsx",
     sharedData: {},
     enableDevDirectory: true, // 在dev环境下临时渲染一个目录页面
-    ejsOption: {}
+    renderEngineOption: {}
   })],
 })
 ```
@@ -114,16 +114,16 @@ export default defineConfig({
    */
   enableDevDirectory?: boolean
   /**
-   * 顶层配置的共享数据，在渲染ejs时会添加到每个入口处。
+   * 顶层配置的共享数据，在渲染LiquidJS时会添加到每个入口处。
    * @default {}
    */
   sharedData?: object
   /**
-   * EJS的一些配置选项
-   * @see {@link https://github.com/mde/ejs#options}
+   * LiquidJS的一些配置选项
+   * @see {@link https://liquidjs.com/tutorials/options.html}
    * @default {}
    */
-  ejsOption?: object
+  renderEngineOption?: object
   /**
    * 多页项目的每个入口文件名, 例如, Vue项目一般为`main.js`, React项目一般为`main.jsx`.
    * @default "main.js"
@@ -163,7 +163,7 @@ export default defineConfig({
    */
   template: string
   /**
-   * 本页EJS模板使用的渲染数据，会与顶层配置的sharedData进行合并
+   * 本页LiquidJS模板使用的渲染数据，会与顶层配置的sharedData进行合并
    * @default {}
    */
   data?: object
@@ -184,7 +184,7 @@ export default pageConfigGenerator({
 
 ### 条件页面配置
 
-借助跨页面的选项 `sharedData` ，您可以注入所需的变量，然后在页面配置中读取它们（或直接在 ejs 模板中使用），例如：
+借助跨页面的选项 `sharedData` ，您可以注入所需的变量，然后在页面配置中读取它们（或直接在 LiquidJS 模板中使用），例如：
 
 ```javascript
 import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
