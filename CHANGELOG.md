@@ -1,3 +1,13 @@
+# [1.2.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.3...v1.2.0) (2024-08-29)
+
+
+### Features
+
+* migrate ejs to liquidjs, close [#26](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/issues/26) ([0c9e9bb](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/0c9e9bb647b39f1950da39832ba8cc7202fa7a3a))
+* type `EntryPathOption` change `ejsOption` to `renderEngineOption` ([fb27ceb](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/fb27cebf92fd622c9bf0c1cc42923c734f26c8ff))
+
+
+
 ## [1.1.3](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.2...v1.1.3) (2024-07-12)
 
 
