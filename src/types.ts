@@ -1,9 +1,10 @@
-import type { Options as EjsOption } from "ejs";
+// import type { Options as EjsOption } from "ejs";
+import type { LiquidOptions } from 'liquidjs'
 
 export type PluginOption = {
     entryName?: string;                 // default:main.js
     configName?: string;                // default:config.json
-    ejsOption?: EjsOption;
+    renderEngineOption?: LiquidOptions;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
     experimental?: ExperimentalPluginOption;
@@ -16,8 +17,8 @@ export type ExperimentalPluginOption = {
 
 export type MergedPluginOption = {
     entryName: string;                 // default:main.js
-    configName: string;
-    ejsOption?: EjsOption;
+    configName?: string;
+    renderEngineOption?: LiquidOptions;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
     experimental?: ExperimentalPluginOption;

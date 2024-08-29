@@ -3,8 +3,9 @@ import {
     readFileSync,
     unlinkSync,
 } from "fs";
-import ejs from "ejs";
-import type { Options as EjsOptions } from "ejs";
+// import ejs from "ejs";
+// import type { Options as EjsOptions } from "ejs";
+import { Liquid, LiquidOptions } from 'liquidjs'
 import { isErrorOfNotFound, PagePluginConfig, ColoringConsole, MergedPluginOption } from "./types";
 import { EntryPath } from "./core";
 import path from "path";
@@ -28,17 +29,26 @@ export const __defaultHTMLTemplate = `<!DOCTYPE html>
   </body>
 </html>`
 
-function renderEjs(
+// function renderEjs(
+//     templateStr: string,
+//     data?: object,
+//     ejsOption?: EjsOptions
+// ): string {
+//     if (data && Object.keys(data).length > 0)
+//         return ejs.render(templateStr, data, {
+//             ...ejsOption,
+//             async: false,
+//         });
+//     return templateStr;
+// }
+
+function renderLiquidTpl(
     templateStr: string,
     data?: object,
-    ejsOption?: EjsOptions
+    liquidjsOption?: LiquidOptions
 ): string {
-    if (data && Object.keys(data).length > 0)
-        return ejs.render(templateStr, data, {
-            ...ejsOption,
-            async: false,
-        });
-    return templateStr;
+    const engine = new Liquid(liquidjsOption);
+    return engine.parseAndRenderSync(templateStr, data);
 }
 
 export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig) {
@@ -55,13 +65,13 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
         _console.error(`Page entry "${entry.abs}", its template cannot be found, using default template as fallback! (${e.message})`)
         htmlContent = __defaultHTMLTemplate
     }
-    htmlContent = renderEjs(
+    htmlContent = renderLiquidTpl(
         htmlContent,
         {
             ...entry.__options.sharedData,
             ...pageConfig.data,
         },
-        entry.__options.ejsOption
+        entry.__options.renderEngineOption
     );
     const generatedHtml = GENERATED_FLAG.concat(htmlContent).replace(
         "</html>",
