@@ -15,7 +15,7 @@ type EntryPathOption = {
     templateName: string;
     entryName: string;
     sharedData?: object
-    ejsOption?: object;
+    renderEngineOption?: object;
 }
 
 export default class Entries {
@@ -50,7 +50,7 @@ export default class Entries {
                     templateName: this.templateName,
                     entryName: this.entryName,
                     sharedData: pluginOption.sharedData,
-                    ejsOption: pluginOption.renderEngineOption,
+                    renderEngineOption: pluginOption.renderEngineOption,
                 }
             }
             this.entries.push(fullDirname)

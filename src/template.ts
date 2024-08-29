@@ -71,7 +71,7 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
             ...entry.__options.sharedData,
             ...pageConfig.data,
         },
-        entry.__options.ejsOption
+        entry.__options.renderEngineOption
     );
     const generatedHtml = GENERATED_FLAG.concat(htmlContent).replace(
         "</html>",
