@@ -9,8 +9,8 @@
 
 <p align='center'>English | <a href="./README.zh.md">中文文档</a></p>
 <br />
-<p align='center'>A file directory-based automated multi-page Vite plugin that supports HTML templates using LiquidJS.</p>
-<p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 LiquidJS 的 HTML 模板。</p>
+<p align='center'>A file directory-based automated multi-page Vite plugin that supports HTML templates using Handlebars.</p>
+<p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 Handlebars 的 HTML 模板。</p>
 <br />
 
 ## Quick Start
@@ -115,13 +115,13 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    */
   enableDevDirectory?: boolean
   /**
-   * Top-level data, which will be shared to every entry during LiquidJS render.
+   * Top-level data, which will be shared to every entry during Handlebars render.
    * @default {}
    */
   sharedData?: object
   /**
-   * Render engine options, currently using LiquidJS
-   * @see {@link https://liquidjs.com/tutorials/options.html}
+   * Render engine options, currently using Handlebars
+   * @see {@link https://Handlebars.com/tutorials/options.html}
    * @default {}
    */
   renderEngineOption?: object
@@ -162,7 +162,7 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    */
   template: string
   /**
-   * LiquidJS render data in this entry, which will be assigned with global `sharedData`
+   * Handlebars render data in this entry, which will be assigned with global `sharedData`
    * @default {}
    */
   data?: object
@@ -183,7 +183,7 @@ export default pageConfigGenerator({
 
 ### Conditional page configuration
 
-We have an option called `sharedData` cross pages, so you can inject the variables you need, then read them in page's config (or directly use in LiquidJS templates), like this,
+We have an option called `sharedData` cross pages, so you can inject the variables you need, then read them in page's config (or directly use in Handlebars templates), like this,
 
 ```javascript
 import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'

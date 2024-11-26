@@ -1,5 +1,5 @@
 {
-    "template": "../templates/ejs-title.html",
+    "template": "../templates/handlebars-title.html",
     "data": {
         "title": "This is the rootDir of vite config"
     }

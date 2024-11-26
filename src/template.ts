@@ -5,7 +5,7 @@ import {
 } from "fs";
 // import ejs from "ejs";
 // import type { Options as EjsOptions } from "ejs";
-import { Liquid, LiquidOptions } from 'liquidjs'
+import Handlebars from 'handlebars'
 import { isErrorOfNotFound, PagePluginConfig, ColoringConsole, MergedPluginOption } from "./types";
 import { EntryPath } from "./core";
 import path from "path";
@@ -42,13 +42,13 @@ export const __defaultHTMLTemplate = `<!DOCTYPE html>
 //     return templateStr;
 // }
 
-function renderLiquidTpl(
+function renderHandlebarsTpl(
     templateStr: string,
     data?: object,
-    liquidjsOption?: LiquidOptions
+    handlebarsOption?: Handlebars.RuntimeOptions
 ): string {
-    const engine = new Liquid(liquidjsOption);
-    return engine.parseAndRenderSync(templateStr, data);
+    const tmpl = Handlebars.compile(templateStr, handlebarsOption)
+    return tmpl(data)
 }
 
 export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig) {
@@ -65,7 +65,7 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
         _console.error(`Page entry "${entry.abs}", its template cannot be found, using default template as fallback! (${e.message})`)
         htmlContent = __defaultHTMLTemplate
     }
-    htmlContent = renderLiquidTpl(
+    htmlContent = renderHandlebarsTpl(
         htmlContent,
         {
             ...entry.__options.sharedData,
@@ -145,7 +145,7 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
         const tmp = readFileSync(configPath, { encoding: "utf-8" })
         pageData = JSON.parse(tmp)
     } else if (entry.__options.configName.endsWith('.js')) {
-        let config = await import(pathToFileURL(configPath).toString()).catch(e => {
+        const config = await import(pathToFileURL(configPath).toString()).catch(e => {
             _console.fatal(e.message);
         })
         if(config && config.default) {
@@ -161,9 +161,9 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
         _console.fatal(`using ${entry.__options.configName} as page config is not supported yet`)
     }
     const generatedHtml = fetchTemplateHTML(entry, pageData)
-    let tplPath = path.join(entry.abs, entry.__options.templateName)
+    const tplPath = path.join(entry.abs, entry.__options.templateName)
     if (existsSync(tplPath)) {
-        let fileContent = readFileSync(tplPath, { encoding: "utf-8" });
+        const fileContent = readFileSync(tplPath, { encoding: "utf-8" });
         if (!fileContent.startsWith(GENERATED_FLAG)) {
             _console.warn(`There is a same named HTML file (${entry.__options.templateName}) already exist in entry '${entry.value}', template generation skipped`)
             return "";
@@ -175,10 +175,10 @@ export async function prepareVirtualEntries(
     entries: EntryPath[],
     pluginOption: MergedPluginOption
 ) {
-    let virtualMap = new Map<string, string>();
+    const virtualMap = new Map<string, string>();
     await Promise.all(entries.map(async entry => {
-        let tplPath = entry.__options.templateName.startsWith(".") ? (entry.abs + entry.__options.templateName) : path.join(entry.abs, entry.__options.templateName);
-        let generatedHtml = await prepareSingleVirtualEntry(entry, pluginOption);
+        const tplPath = entry.__options.templateName.startsWith(".") ? (entry.abs + entry.__options.templateName) : path.join(entry.abs, entry.__options.templateName);
+        const generatedHtml = await prepareSingleVirtualEntry(entry, pluginOption);
         virtualMap.set(tplPath, generatedHtml);
     }));
     return virtualMap;
