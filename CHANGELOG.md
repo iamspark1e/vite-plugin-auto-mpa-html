@@ -1,3 +1,12 @@
+# [1.3.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.2.0...v1.3.0) (2024-11-26)
+
+
+### Features
+
+* migrate template engine from liquidjs to handlebars ([16e511c](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/16e511c105f46ba385771c0c5c5c41e61c9d9dcc))
+
+
+
 # [1.2.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.1.3...v1.2.0) (2024-08-29)
 
 
