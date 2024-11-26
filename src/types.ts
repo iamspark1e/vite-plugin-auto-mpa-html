@@ -1,10 +1,10 @@
 // import type { Options as EjsOption } from "ejs";
-import type { LiquidOptions } from 'liquidjs'
+import type Handlebars from 'handlebars'
 
 export type PluginOption = {
     entryName?: string;                 // default:main.js
     configName?: string;                // default:config.json
-    renderEngineOption?: LiquidOptions;
+    renderEngineOption?: Handlebars.RuntimeOptions;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
     experimental?: ExperimentalPluginOption;
@@ -18,7 +18,7 @@ export type ExperimentalPluginOption = {
 export type MergedPluginOption = {
     entryName: string;                 // default:main.js
     configName?: string;
-    renderEngineOption?: LiquidOptions;
+    renderEngineOption?: Handlebars.RuntimeOptions;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
     experimental?: ExperimentalPluginOption;
@@ -82,7 +82,7 @@ export class ColoringConsole {
      * @see {@link https://sparkle.im/post/node-js%E7%8E%AF%E5%A2%83log%E9%A2%9C%E8%89%B2%E8%A1%A8}
      * default "debug" color is white
      */
-    private coloredMsg = (msg: string, colorPrefix: string = "\x1b[37m") => {
+    private coloredMsg = (msg: string, colorPrefix = "\x1b[37m") => {
         return `${colorPrefix}[vite-plugin-auto-mpa-html]: ${msg}\x1b[0m`
     }
 

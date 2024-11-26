@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-auto-mpa-html",
   "version": "1.2.0",
-  "description": "A file directory-based automated multi-page Vite plugin that supports HTML templates using LiquidJS.",
+  "description": "A file directory-based automated multi-page Vite plugin that supports HTML templates using Handlebars.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -35,7 +35,7 @@
   "license": "MIT",
   "dependencies": {
     "glob": "^9.3.1",
-    "liquidjs": "^10.16.5"
+    "handlebars": "^4.7.8"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.1",

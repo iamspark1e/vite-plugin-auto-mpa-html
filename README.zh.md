@@ -9,7 +9,7 @@
 
 <p align='center'><a href="./README.md">English</a> | 中文文档</p>
 <br />
-<p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 LiquidJS 的 HTML 模板。</p>
+<p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 Handlebars 的 HTML 模板。</p>
 <br />
 
 ## 快速使用
@@ -114,13 +114,13 @@ export default defineConfig({
    */
   enableDevDirectory?: boolean
   /**
-   * 顶层配置的共享数据，在渲染LiquidJS时会添加到每个入口处。
+   * 顶层配置的共享数据，在渲染Handlebars时会添加到每个入口处。
    * @default {}
    */
   sharedData?: object
   /**
-   * LiquidJS的一些配置选项
-   * @see {@link https://liquidjs.com/tutorials/options.html}
+   * Handlebars的一些配置选项
+   * @see {@link https://Handlebars.com/tutorials/options.html}
    * @default {}
    */
   renderEngineOption?: object
@@ -163,7 +163,7 @@ export default defineConfig({
    */
   template: string
   /**
-   * 本页LiquidJS模板使用的渲染数据，会与顶层配置的sharedData进行合并
+   * 本页Handlebars模板使用的渲染数据，会与顶层配置的sharedData进行合并
    * @default {}
    */
   data?: object
@@ -184,7 +184,7 @@ export default pageConfigGenerator({
 
 ### 条件页面配置
 
-借助跨页面的选项 `sharedData` ，您可以注入所需的变量，然后在页面配置中读取它们（或直接在 LiquidJS 模板中使用），例如：
+借助跨页面的选项 `sharedData` ，您可以注入所需的变量，然后在页面配置中读取它们（或直接在 Handlebars 模板中使用），例如：
 
 ```javascript
 import { pageConfigGenerator } from 'vite-plugin-auto-mpa-html'
