@@ -121,7 +121,7 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
   sharedData?: object
   /**
    * Render engine options, currently using Handlebars
-   * @see {@link https://Handlebars.com/tutorials/options.html}
+   * @see {@link https://handlebarsjs.com/api-reference/compilation.html}
    * @default {}
    */
   renderEngineOption?: object

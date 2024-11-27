@@ -120,7 +120,7 @@ export default defineConfig({
   sharedData?: object
   /**
    * Handlebars的一些配置选项
-   * @see {@link https://Handlebars.com/tutorials/options.html}
+   * @see {@link https://handlebarsjs.com/zh/api-reference/compilation.html}
    * @default {}
    */
   renderEngineOption?: object
