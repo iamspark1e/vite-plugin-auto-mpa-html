@@ -3,8 +3,6 @@ import {
     readFileSync,
     unlinkSync,
 } from "fs";
-// import ejs from "ejs";
-// import type { Options as EjsOptions } from "ejs";
 import Handlebars from 'handlebars'
 import { isErrorOfNotFound, PagePluginConfig, ColoringConsole, MergedPluginOption } from "./types";
 import { EntryPath } from "./core";
@@ -45,10 +43,13 @@ export const __defaultHTMLTemplate = `<!DOCTYPE html>
 function renderHandlebarsTpl(
     templateStr: string,
     data?: object,
-    handlebarsOption?: Handlebars.RuntimeOptions
+    handlebarsOption?: {
+        compileOptions?: CompileOptions,
+        runtimeOptions?: Handlebars.RuntimeOptions
+    }
 ): string {
-    const tmpl = Handlebars.compile(templateStr, handlebarsOption)
-    return tmpl(data)
+    const tmpl = Handlebars.compile(templateStr, handlebarsOption?.compileOptions)
+    return tmpl(data, handlebarsOption?.runtimeOptions)
 }
 
 export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig) {

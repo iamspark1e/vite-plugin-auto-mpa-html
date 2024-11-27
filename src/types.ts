@@ -4,7 +4,10 @@ import type Handlebars from 'handlebars'
 export type PluginOption = {
     entryName?: string;                 // default:main.js
     configName?: string;                // default:config.json
-    renderEngineOption?: Handlebars.RuntimeOptions;
+    renderEngineOption?: {
+        compileOptions?: CompileOptions,
+        runtimeOptions?: Handlebars.RuntimeOptions
+    };
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
     experimental?: ExperimentalPluginOption;
@@ -18,7 +21,10 @@ export type ExperimentalPluginOption = {
 export type MergedPluginOption = {
     entryName: string;                 // default:main.js
     configName?: string;
-    renderEngineOption?: Handlebars.RuntimeOptions;
+    renderEngineOption?: {
+        compileOptions?: CompileOptions,
+        runtimeOptions?: Handlebars.RuntimeOptions
+    };
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
     experimental?: ExperimentalPluginOption;

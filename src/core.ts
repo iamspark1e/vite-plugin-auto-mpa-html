@@ -23,7 +23,7 @@ export default class Entries {
 
     configName = "config.json"
     templateName = "/index.html"
-    entryName: string = "main.js"
+    entryName = "main.js"
 
     constructor(config: UserConfig, pluginOption: MergedPluginOption) {
         const _console = new ColoringConsole(1)

@@ -51,11 +51,11 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     let dirname: string;
     let foundedEntry: EntryPath | undefined;
     if (opt.experimental?.customTemplateName === '.html') {
-      let matchedFolder = fileUrl.match(/\/(.*).html/)
+      const matchedFolder = fileUrl.match(/\/(.*).html/)
       if (!matchedFolder || !matchedFolder[1]) {
         throw new Error(`Could not match the entry module (${fileUrl}) in experimental.customTemplateName mode, please check.`)
       }
-      let dirname = matchedFolder[1];
+      const dirname = matchedFolder[1];
       foundedEntry = entries.entries.find(entry => {
         if (entry.value === dirname) return true;
         return false;
