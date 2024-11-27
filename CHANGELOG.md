@@ -1,3 +1,12 @@
+## [1.3.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.3.0...v1.3.1) (2024-11-27)
+
+
+### Bug Fixes
+
+* renderEngineOption should specify compile option and runtime option ([446d8d9](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/446d8d92e9347d98c162e5532532595552556e16))
+
+
+
 # [1.3.0](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.2.0...v1.3.0) (2024-11-26)
 
 
