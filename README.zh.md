@@ -213,6 +213,18 @@ export default pageConfigGenerator((opt) => {
 
 - 当 `experimental.customTemplateName` 配置为 `".html"` 时，即希望根据目录名称自动生成对应名称的html文件，此时如果根目录有符合条件的入口文件，构建将会失败，以避免生成到outDir目录外，污染其他项目。
 
+- 本插件原本不支持页面配置更改时自动重启的功能，但你可以使用由@antfu维护的vite-plugin-restart，并添加如下配置，
+
+```javascript
+ViteRestart({
+  restart: [
+    'config.[jt]s', // your configuration file name
+  ]
+})
+```
+
+- Vite v6+ 默认开启`server.preTransformRequests`，目前插件所自动产生的资源路径没有被支持，因此会产生报错如 `[vite] Pre-transform error: Failed to load url /src/main.js (resolved id: /src/main.js). Does the file exist?` 但不影响实际构建，如果对于此报错信息非常在意可以设置 `server.preTransformRequests` 为 `false`。
+
 ## Vite自身特性
 
 - [x] 环境变量和模式(Vite v4.2+)
