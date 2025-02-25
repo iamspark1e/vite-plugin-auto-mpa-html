@@ -223,8 +223,6 @@ ViteRestart({
 })
 ```
 
-- Vite v6+ 默认开启`server.preTransformRequests`，目前插件所自动产生的资源路径没有被支持，因此会产生报错如 `[vite] Pre-transform error: Failed to load url /src/main.js (resolved id: /src/main.js). Does the file exist?` 但不影响实际构建，如果对于此报错信息非常在意可以设置 `server.preTransformRequests` 为 `false`。
-
 ## Vite自身特性
 
 - [x] 环境变量和模式(Vite v4.2+)
