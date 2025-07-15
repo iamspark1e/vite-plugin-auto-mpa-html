@@ -18,9 +18,9 @@ export const __defaultHTMLTemplate = `<!DOCTYPE html>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%- (typeof title != 'undefined' ? title : '') %></title>
-    <meta name="description" content="<%- (typeof description != 'undefined' ? description : '') %>" />
-    <meta name="keywords" content="<%- (typeof keywords != 'undefined' ? keywords : '') %>" />
+    {{#if title}}<title>{{title}}</title>{{else}}<title>Application</title>{{/if}}
+    {{#if description}}<meta name="description" content="{{description}}" />{{/if}}
+    {{#if keywords}}<meta name="keywords" content="{{keywords}}" />{{/if}}
   </head>
   <body>
     <div id="app"></div>
