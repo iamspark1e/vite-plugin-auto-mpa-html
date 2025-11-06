@@ -74,11 +74,22 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
         },
         entry.__options.renderEngineOption
     );
+    
+    // 生成脚本路径 - 使用绝对路径以支持 history 路由
+    let scriptSrc: string;
+    if (entry.__options.templateName.startsWith("/")) {
+        // 自定义模板名称，使用相对路径
+        scriptSrc = `./${entry.__options.entryName}`;
+    } else {
+        // 标准模式，使用绝对路径
+        scriptSrc = entry.value === '.' 
+            ? `/${entry.__options.entryName}` 
+            : `/${entry.value}/${entry.__options.entryName}`;
+    }
+    
     const generatedHtml = GENERATED_FLAG.concat(htmlContent).replace(
         "</html>",
-        // FIXME: this line of rewrite entry module script is not perfect
-        `<script type="module" src="${entry.__options.templateName.startsWith("/") ? `./${entry.__options.entryName}` : `./${entry.value.includes('/') ? entry.value.split('/').reverse()[0] : entry.value}/${entry.__options.entryName}`}"></script></html>`
-        // `<script type="module" src="${path.relative(root, entry.abs + '/' + entry.__options.entryName)}"></script></html>`
+        `<script type="module" src="${scriptSrc}"></script></html>`
     );
     return generatedHtml
 }
