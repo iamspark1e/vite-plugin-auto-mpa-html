@@ -63,35 +63,39 @@ describe("Test plugin's lifecycle - devServer", async () => {
   });
 });
 
-// describe.todo("Test plugin's lifecycle - devServer (disabled directory page)", async () => {
-//   let tmp
-//   let entries: Entries;
-//   beforeAll(async () => {
-//     tmp = connect()
-//     const viteServer = await createServer({
-//       root: path.resolve(__dirname, "example", "src"),
-//       server: {
-//         middlewareMode: true,
-//       },
-//       appType: "custom",
-//       publicDir: "./public"
-//     });
-//     entries = new Entries({
-//       root: "tests/example/src"
-//     }, {
-//       entryName: "main.jsx",
-//       enableDevDirectory: false
-//     })
-//     tmp.use(viteServer.middlewares);
-//     tmp.use(devServerMiddleware(entries, pluginOption, viteServer));
-//   });
+describe("Test plugin's lifecycle - devServer (disabled directory page)", async () => {
+  let tmp
+  let entries: Entries;
+  const disabledDirOption: MergedPluginOption = {
+    entryName: "main.jsx",
+    configName: "config.json",
+    enableDevDirectory: false
+  };
+  beforeAll(async () => {
+    tmp = connect();
+    const viteServer = await createServer({
+      root: path.resolve(__dirname, "example", "src"),
+      server: {
+        middlewareMode: true,
+      },
+      appType: "custom",
+      publicDir: "./public"
+    });
+    entries = new Entries({
+      root: "tests/example/src"
+    }, disabledDirOption)
+    tmp.use(viteServer.middlewares);
+    tmp.use(devServerMiddleware(entries, disabledDirOption, viteServer));
+  });
 
-//   it("devMiddleware should not generate directory page if plugin options set `enableDevDirectory` to false", async () => {
-//     const res = await request(tmp).get("/");
-//     expect(res.text).toMatch("<title>This is the rootDir of vite config</title>");
-//   });
+  it("devMiddleware should not generate directory page if plugin options set `enableDevDirectory` to false", async () => {
+    const res = await request(tmp).get("/");
+    // When directory page is disabled, root path should NOT contain "Project Directory" title
+    expect(res.text).not.toMatch("<title>Project Directory</title>");
+  });
 
-//   afterAll(() => {
-//     vi.restoreAllMocks();
-//   });
-// });
+  afterAll(() => {
+    tmp = null;
+    vi.restoreAllMocks();
+  });
+});

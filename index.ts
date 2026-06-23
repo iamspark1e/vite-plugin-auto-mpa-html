@@ -13,6 +13,10 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         ...defaultPluginOption,
         ...(pluginOption ? pluginOption : {}),
         entryName: pluginOption?.entryName ?? defaultPluginOption.entryName,
+        experimental: {
+            ...defaultPluginOption.experimental,
+            ...(pluginOption?.experimental ?? {}),
+        },
     }
     let entries: Entries;
     let cmd: string;
@@ -68,7 +72,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                     }
                 }
                 // input[entryName] = entry.abs + entry.__options.templateName
-                input[entryName] = PREFIX + entry.abs + entry.__options.templateName
+                input[entryName] = PREFIX + path.join(entry.abs, entry.__options.templateName)
             })
 
             let generatedConfig: UserConfig = {

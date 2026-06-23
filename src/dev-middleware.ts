@@ -25,7 +25,8 @@ export function genDirectory(entries: Entries) {
         <h1 style="font-size:20px;">Directory:</h1>
         <ul>
           ${entries.entries.map(entry => {
-    return `<li><a target="_blank" href="${entry.value + entry.__options.templateName}">${entry.value}</a></li>`
+    const templateName = entry.__options.templateName;
+    return `<li><a target="_blank" href="${entry.value === '.' ? templateName : entry.value + templateName}">${entry.value}</a></li>`
   }).join("")}
         </ul>
       </div>
@@ -43,10 +44,24 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     let fileUrl = req.url || "";
     if (fileUrl.includes("?")) fileUrl = fileUrl.split("?")[0];
     if (!fileUrl.endsWith(".html") && fileUrl !== "/") return next();
-    if (opt.enableDevDirectory && fileUrl.endsWith("/")) {
-      res.setHeader("Content-Type", "text/html");
-      res.end(genDirectory(entries));
-      return;
+    if (opt.enableDevDirectory && fileUrl === "/") {
+      // Only show directory listing for root path
+      const rootEntry = entries.entries.find(entry => entry.value === ".");
+      if (rootEntry) {
+        const rootIndexHtml = path.join(rootEntry.abs, "index.html");
+        if (!existsSync(rootIndexHtml)) {
+          // No root index.html, show directory listing
+          res.setHeader("Content-Type", "text/html");
+          res.end(genDirectory(entries));
+          return;
+        }
+        // Root has index.html, let it be handled by the entry matching logic below
+      } else {
+        // No root entry, show directory listing
+        res.setHeader("Content-Type", "text/html");
+        res.end(genDirectory(entries));
+        return;
+      }
     }
     let dirname: string;
     let foundedEntry: EntryPath | undefined;
@@ -71,7 +86,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
       })
     }
     if (!foundedEntry) return next();
-    const configUrl = foundedEntry.abs + "/" + foundedEntry.__options.configName
+    const configUrl = path.join(foundedEntry.abs, foundedEntry.__options.configName)
     // render as normal when no config file detected.
     if (!existsSync(configUrl)) {
       // the founded entry exist but the config file cannot be found, add an alert in console
@@ -80,7 +95,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     }
     let generatedHtml = await prepareSingleVirtualEntry(foundedEntry, opt).catch(e => {
       console.log(e.message);
-      return next();
+      return undefined;
     })
     if (!generatedHtml) return next();
     generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml);

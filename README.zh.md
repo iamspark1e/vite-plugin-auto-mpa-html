@@ -159,9 +159,9 @@ export default defineConfig({
 {
   /**
    * 本页应用模板的*相对*路径
-   * @required
+   * @optional 如果不提供，将使用默认模板
    */
-  template: string
+  template?: string
   /**
    * 本页Handlebars模板使用的渲染数据，会与顶层配置的sharedData进行合并
    * @default {}

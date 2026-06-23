@@ -1,8 +1,7 @@
 import path from "path";
-import pkg from 'glob';
+import { globSync } from 'glob';
 import { UserConfig } from "vite";
 import { ColoringConsole, MergedPluginOption } from "./types";
-const { globSync } = pkg;
 
 export type EntryPath = {
     value: string;

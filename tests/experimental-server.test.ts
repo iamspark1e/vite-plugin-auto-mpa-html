@@ -62,6 +62,12 @@ describe("Test plugin's lifecycle - devServer (experimental mode)", async () => 
     expect(res.text).toMatch("<title>Project Directory</title>");
   });
 
+  it("devMiddleware should handle non-existent entry in experimental mode", async () => {
+    const res = await request(tmp).get("/nonexistent.html");
+    // Should return 404 or redirect since the entry doesn't exist
+    expect(res.status).not.toBe(200);
+  });
+
   afterAll(() => {
     tmp = null;
     vi.restoreAllMocks();

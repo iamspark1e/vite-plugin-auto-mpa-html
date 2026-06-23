@@ -54,9 +54,12 @@ function renderHandlebarsTpl(
 
 export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig) {
     let htmlContent;
+    const templatePath = pageConfig.template 
+        ? path.resolve(entry.abs, pageConfig.template)
+        : path.join(entry.abs, entry.__options.templateName);
     try {
         htmlContent = readFileSync(
-            path.resolve(entry.abs, pageConfig.template || ""),
+            templatePath,
             {
                 encoding: "utf-8",
             }
@@ -148,7 +151,7 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
         pageData = JSON.parse(tmp)
     } else if (entry.__options.configName.endsWith('.js')) {
         const config = await import(pathToFileURL(configPath).toString()).catch(e => {
-            _console.fatal(e.message);
+            _console.error(e.message);
             return undefined;
         })
         if(config && config.default) {
@@ -158,11 +161,11 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
                 pageData = config.default
             }
         } else {
-            _console.fatal(`config file ${configPath} cannot be parsed and imported, maybe forgot exporting default?`)
+            _console.error(`config file ${configPath} cannot be parsed and imported, maybe forgot exporting default?`)
             return "";
         }
     } else {
-        _console.fatal(`using ${entry.__options.configName} as page config is not supported yet`)
+        _console.error(`using ${entry.__options.configName} as page config is not supported yet`)
         return "";
     }
     const generatedHtml = fetchTemplateHTML(entry, pageData)
@@ -182,7 +185,7 @@ export async function prepareVirtualEntries(
 ) {
     const virtualMap = new Map<string, string>();
     await Promise.all(entries.map(async entry => {
-        const tplPath = entry.__options.templateName.startsWith(".") ? (entry.abs + entry.__options.templateName) : path.join(entry.abs, entry.__options.templateName);
+        const tplPath = path.join(entry.abs, entry.__options.templateName);
         const generatedHtml = await prepareSingleVirtualEntry(entry, pluginOption);
         virtualMap.set(tplPath, generatedHtml);
     }));

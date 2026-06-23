@@ -158,9 +158,9 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
 {
   /**
    * The RELATIVE path of your template
-   * @required
+   * @optional If not provided, a default template will be used
    */
-  template: string
+  template?: string
   /**
    * Handlebars render data in this entry, which will be assigned with global `sharedData`
    * @default {}
