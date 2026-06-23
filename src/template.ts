@@ -77,7 +77,7 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
     const generatedHtml = GENERATED_FLAG.concat(htmlContent).replace(
         "</html>",
         // FIXME: this line of rewrite entry module script is not perfect
-        `<script type="module" src="${entry.__options.templateName.startsWith("/") ? `./${entry.__options.entryName}` : `./${entry.value.includes('/') ? entry.value.split('/').reverse()[0] : entry.value}/${entry.__options.entryName}`}"></script></html>`
+        `<script type="module" src="${entry.__options.templateName.startsWith("/") ? `./${entry.__options.entryName}` : `./${path.basename(entry.value)}/${entry.__options.entryName}`}"></script></html>`
         // `<script type="module" src="${path.relative(root, entry.abs + '/' + entry.__options.entryName)}"></script></html>`
     );
     return generatedHtml
@@ -141,6 +141,7 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
     const configPath = path.join(entry.abs, entry.__options.configName);
     if (!existsSync(configPath)) {
         _console.fatal(`Page entry: ${entry.value}, its config (${entry.__options.configName}) cannot be found, please check!`)
+        return "";
     }
     if (entry.__options.configName.endsWith('.json')) {
         const tmp = readFileSync(configPath, { encoding: "utf-8" })
@@ -148,6 +149,7 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
     } else if (entry.__options.configName.endsWith('.js')) {
         const config = await import(pathToFileURL(configPath).toString()).catch(e => {
             _console.fatal(e.message);
+            return undefined;
         })
         if(config && config.default) {
             if(typeof config.default == "function") {
@@ -157,9 +159,11 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
             }
         } else {
             _console.fatal(`config file ${configPath} cannot be parsed and imported, maybe forgot exporting default?`)
+            return "";
         }
     } else {
         _console.fatal(`using ${entry.__options.configName} as page config is not supported yet`)
+        return "";
     }
     const generatedHtml = fetchTemplateHTML(entry, pageData)
     const tplPath = path.join(entry.abs, entry.__options.templateName)

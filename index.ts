@@ -11,7 +11,8 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     let config: ResolvedConfig;
     const opt: MergedPluginOption = {
         ...defaultPluginOption,
-        ...(pluginOption ? pluginOption : {})
+        ...(pluginOption ? pluginOption : {}),
+        entryName: pluginOption?.entryName ?? defaultPluginOption.entryName,
     }
     let entries: Entries;
     let cmd: string;
