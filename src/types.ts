@@ -10,12 +10,17 @@ export type PluginOption = {
     };
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
+    historyApiFallback?: boolean;       // default:false, enable history API fallback for SPA routing
     experimental?: ExperimentalPluginOption;
 }
 
 export type ExperimentalPluginOption = {
     customTemplateName?: string;
-    rootEntryDistName?: string; // if an entry is placed at the root folder of vite config's `root`, you can change its name, use "_root" as default. 
+    rootEntryDistName?: string; // if an entry is placed at the root folder of vite config's `root`, you can change its name, use "_root" as default.
+    /** @deprecated Use top-level `enableDevDirectory` instead. This will be removed when experimental options are deprecated. */
+    enableDevDirectory?: boolean;
+    /** @deprecated Use top-level `historyApiFallback` instead. This will be removed when experimental options are deprecated. */
+    historyApiFallback?: boolean;
 }
 
 export type MergedPluginOption = {
@@ -27,6 +32,7 @@ export type MergedPluginOption = {
     };
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
+    historyApiFallback: boolean;        // default:false, enable history API fallback for SPA routing
     experimental?: ExperimentalPluginOption;
 }
 
@@ -34,6 +40,7 @@ export const defaultPluginOption = {
     entryName: "main.js",
     configName: "config.json",
     enableDevDirectory: true,
+    historyApiFallback: false,
     experimental: {}
 }
 

@@ -9,18 +9,31 @@ import path from 'path'
 
 function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     let config: ResolvedConfig;
+    const _console = new ColoringConsole(1);
+
+    // Merge experimental options with backward compatibility
+    // experimental options act as fallback when top-level options are not set
+    const experimental = {
+        ...defaultPluginOption.experimental,
+        ...(pluginOption?.experimental ?? {}),
+    };
+
     const opt: MergedPluginOption = {
         ...defaultPluginOption,
         ...(pluginOption ? pluginOption : {}),
         entryName: pluginOption?.entryName ?? defaultPluginOption.entryName,
-        experimental: {
-            ...defaultPluginOption.experimental,
-            ...(pluginOption?.experimental ?? {}),
-        },
+        // Backward compatibility: experimental.enableDevDirectory fallback
+        enableDevDirectory: pluginOption?.enableDevDirectory
+            ?? pluginOption?.experimental?.enableDevDirectory
+            ?? defaultPluginOption.enableDevDirectory,
+        // Backward compatibility: experimental.historyApiFallback fallback
+        historyApiFallback: pluginOption?.historyApiFallback
+            ?? pluginOption?.experimental?.historyApiFallback
+            ?? defaultPluginOption.historyApiFallback,
+        experimental,
     }
     let entries: Entries;
     let cmd: string;
-    const _console = new ColoringConsole(1);
     const PREFIX = '\0virtual-auto-mpa-html:'
     let virtualMap: Map<string, string>;
     return {

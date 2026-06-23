@@ -45,28 +45,28 @@ export default defineConfig({
 ├── package.json
 ├── package-lock.json
 ├── public
-│   └── vite.svg
+│   └── vite.svg
 ├── src
-│   ├── index
-│   │   ├── App.css
-│   │   ├── App.tsx
-│   │   ├── assets
-│   │   │   └── react.svg
-│   │   ├── config.json
-│   │   ├── index.css
-│   │   ├── main.tsx
-│   │   └── vite-env.d.ts
-│   └── page2
-│       ├── App.css
-│       ├── App.tsx
-│       ├── assets
-│       │   └── react.svg
-│       ├── config.json
-│       ├── index.css
-│       ├── main.tsx
-│       └── vite-env.d.ts
+│   ├── index
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── assets
+│   │   │   └── react.svg
+│   │   ├── config.json
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   └── page2
+│       ├── App.css
+│       ├── App.tsx
+│       ├── assets
+│       │   └── react.svg
+│       ├── config.json
+│       ├── index.css
+│       ├── main.tsx
+│       └── vite-env.d.ts
 ├── templates
-│   └── index.html
+│   └── index.html
 ├── tsconfig.json
 ├── tsconfig.node.json
 └── vite.config.ts
@@ -104,7 +104,7 @@ export default defineConfig({
 
 > 提示，本插件在构建过程中会生成一个临时的`index.html`在各个入口处，请注意避免冲突！
 
-## Plugin Options
+## 插件选项
 
 ```typescript
 {
@@ -113,6 +113,12 @@ export default defineConfig({
    * @default true
    */
   enableDevDirectory?: boolean
+  /**
+   * 开启 history API fallback，用于开发环境下的 SPA 路由。
+   * 开启后，对于不存在的路径请求，如果 Accept 头包含 "text/html"，会自动回退到最近的入口 HTML。
+   * @default false
+   */
+  historyApiFallback?: boolean
   /**
    * 顶层配置的共享数据，在渲染Handlebars时会添加到每个入口处。
    * @default {}
@@ -135,7 +141,8 @@ export default defineConfig({
    */
   configName?: string
   /**
-   * 测试特性，键值可能会在版本更新时有改动，请注意！
+   * 实验性功能，使用风险自负！
+   * 注意：experimental 选项将来会被弃用，请使用顶级选项替代。
    */
   experimental?: {
     /**
@@ -147,11 +154,19 @@ export default defineConfig({
      * 由于根目录(vite.config.js内配置的root选项)无法自动获取入口名称，默认使用_root作为其module名，你也可以通过这个配置项来自定义。
      */
     rootEntryDistName?: string
+    /**
+     * @deprecated 请使用顶级 `enableDevDirectory` 选项替代。
+     */
+    enableDevDirectory?: boolean
+    /**
+     * @deprecated 请使用顶级 `historyApiFallback` 选项替代。
+     */
+    historyApiFallback?: boolean
   }
 }
 ```
 
-## 每个入口页面的单独配置选项
+## 页面配置选项
 
 这个文件是放置在每个入口目录的`config.json`
 
@@ -204,6 +219,30 @@ export default pageConfigGenerator((opt) => {
 /** @type {import('vite-plugin-auto-mpa-html').PageConfigGeneratorTypeExport} */
 /** @param {import('vite-plugin-auto-mpa-html').PageConfigOption} opt  */
 ```
+
+## URL 匹配行为
+
+插件支持不带 `.html` 后缀的 URL 自动匹配：
+
+| URL 模式 | 普通模式 | 实验模式 (`.html`) |
+|----------|---------|-------------------|
+| `/subdir` | 返回 `subdir/index.html` | 返回 `subdir.html` |
+| `/subdir/nested` | 返回 `subdir/nested/index.html` | 返回 `subdir/nested.html` |
+| `/subdir/page` (不存在) | 当 `historyApiFallback: true` 时回退到 `subdir/index.html` | 当 `historyApiFallback: true` 时回退到 `subdir.html` |
+| `/nonexistent` | 透传 (next()) | 透传 (next()) |
+
+## History API Fallback
+
+当启用 `historyApiFallback` 时，插件会自动将不匹配任何入口的路径回退到最近的父级入口 HTML。这对于使用客户端路由的 SPA 应用非常有用（如 React Router、Vue Router）。
+
+```javascript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  historyApiFallback: true
+})
+```
+
+例如，如果你在 `/subdir` 有一个入口，访问 `/subdir/any/nested/path` 将返回 `subdir/index.html`（或实验模式下的 `subdir.html`）的渲染结果。
 
 ## 局限
 

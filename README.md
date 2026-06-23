@@ -46,28 +46,28 @@ Now, focus on your __PAGES__, for example, a project like this,
 ├── package.json
 ├── package-lock.json
 ├── public
-│   └── vite.svg
+│   └── vite.svg
 ├── src
-│   ├── index
-│   │   ├── App.css
-│   │   ├── App.tsx
-│   │   ├── assets
-│   │   │   └── react.svg
-│   │   ├── config.json
-│   │   ├── index.css
-│   │   ├── main.tsx
-│   │   └── vite-env.d.ts
-│   └── page2
-│       ├── App.css
-│       ├── App.tsx
-│       ├── assets
-│       │   └── react.svg
-│       ├── config.json
-│       ├── index.css
-│       ├── main.tsx
-│       └── vite-env.d.ts
+│   ├── index
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── assets
+│   │   │   └── react.svg
+│   │   ├── config.json
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   └── page2
+│       ├── App.css
+│       ├── App.tsx
+│       ├── assets
+│       │   └── react.svg
+│       ├── config.json
+│       ├── index.css
+│       ├── main.tsx
+│       └── vite-env.d.ts
 ├── templates
-│   └── index.html
+│   └── index.html
 ├── tsconfig.json
 ├── tsconfig.node.json
 └── vite.config.ts
@@ -115,6 +115,13 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    */
   enableDevDirectory?: boolean
   /**
+   * Enable history API fallback for SPA routing in development.
+   * When enabled, requests for non-existent paths will fallback to the nearest entry's HTML
+   * if the Accept header includes "text/html".
+   * @default false
+   */
+  historyApiFallback?: boolean
+  /**
    * Top-level data, which will be shared to every entry during Handlebars render.
    * @default {}
    */
@@ -137,6 +144,7 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
   configName?: string
   /**
    * Experimental features for plugin, using at your own risk!
+   * Note: experimental options will be deprecated in the future, use top-level options instead.
    */
   experimental?: {
     /**
@@ -148,6 +156,14 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
      * Config the asset name of root's entry file, default value is "_root"
      */
     rootEntryDistName?: string
+    /**
+     * @deprecated Use top-level `enableDevDirectory` instead.
+     */
+    enableDevDirectory?: boolean
+    /**
+     * @deprecated Use top-level `historyApiFallback` instead.
+     */
+    historyApiFallback?: boolean
   }
 }
 ```
@@ -203,6 +219,30 @@ export default pageConfigGenerator((opt) => {
 /** @type {import('vite-plugin-auto-mpa-html').PageConfigGeneratorTypeExport} */
 /** @param {import('vite-plugin-auto-mpa-html').PageConfigOption} opt  */
 ```
+
+## URL Matching Behavior
+
+The plugin supports automatic URL matching without requiring `.html` suffix:
+
+| URL Pattern | Normal Mode | Experimental Mode (`.html`) |
+|-------------|-------------|----------------------------|
+| `/subdir` | Returns `subdir/index.html` | Returns `subdir.html` |
+| `/subdir/nested` | Returns `subdir/nested/index.html` | Returns `subdir/nested.html` |
+| `/subdir/page` (non-existent) | Falls back to `subdir/index.html` when `historyApiFallback: true` | Falls back to `subdir.html` when `historyApiFallback: true` |
+| `/nonexistent` | Passes through (next()) | Passes through (next()) |
+
+## History API Fallback
+
+When `historyApiFallback` is enabled, the plugin will automatically fallback to the nearest parent entry's HTML for paths that don't match any entry. This is useful for SPA applications using client-side routing (e.g., React Router, Vue Router).
+
+```javascript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  historyApiFallback: true
+})
+```
+
+For example, if you have an entry at `/subdir`, accessing `/subdir/any/nested/path` will return the rendered HTML of `subdir/index.html` (or `subdir.html` in experimental mode).
 
 ## Limitation
 

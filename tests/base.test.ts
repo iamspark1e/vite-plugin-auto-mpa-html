@@ -5,7 +5,8 @@ import type { MergedPluginOption } from "../src/types";
 
 const pluginOption: MergedPluginOption = {
   entryName: "main.jsx",
-  enableDevDirectory: false
+  enableDevDirectory: false,
+  historyApiFallback: false
 };
 
 describe("Test base function - generate entries", () => {

@@ -8,7 +8,8 @@ describe('Helpers - genDirectory', () => {
     let entries: Entries;
     const pluginOption: MergedPluginOption = {
         entryName: "main.jsx",
-        enableDevDirectory: true
+        enableDevDirectory: true,
+        historyApiFallback: false
     }
     beforeAll(() => {
         entries = new Entries({

@@ -10,11 +10,12 @@ import Entries from "../src/core.js";
 const pluginOption: MergedPluginOption = {
   entryName: "main.jsx",
   configName: "config.json",
-  enableDevDirectory: true
+  enableDevDirectory: true,
+  historyApiFallback: false
 };
 
-describe("Test plugin's lifecycle - devServer", async () => {
-  let tmp
+describe("Test plugin's lifecycle - devServer (basic)", async () => {
+  let tmp: ReturnType<typeof connect>;
   let entries: Entries;
   beforeAll(async () => {
     tmp = connect();
@@ -34,7 +35,6 @@ describe("Test plugin's lifecycle - devServer", async () => {
   });
 
   it("devMiddleware should bypass non-HTML requests", async () => {
-    // let entryComponents = getBuildRequiredComponents(path.resolve(__dirname, "example"), entries, pluginOption.entryName)
     const res = await request(tmp).get("/index.css");
     expect(res.text).toMatch(":root{background-color:#fff}");
   });
@@ -42,9 +42,6 @@ describe("Test plugin's lifecycle - devServer", async () => {
   it("devMiddleware should block HTML requests and replace with rendered", async () => {
     const res = await request(tmp).get("/subdir/index.html");
     expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
-    // expect(res.text).toMatch(
-    //   `<script type="module" src="./${pluginOption.entryName}"></script>`
-    // );
   });
 
   it("devMiddleware should not block html if exist in public folder", async () => {
@@ -57,19 +54,45 @@ describe("Test plugin's lifecycle - devServer", async () => {
     expect(res.text).toMatch("<title>Project Directory</title>");
   });
 
+  it("devMiddleware should return rendered HTML for directory URL without .html suffix", async () => {
+    const res = await request(tmp).get("/subdir");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+  });
+
+  it("devMiddleware should return rendered HTML for nested directory URL without .html suffix", async () => {
+    const res = await request(tmp).get("/subdir/nested");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+  });
+
+  it("devMiddleware should handle URL with query parameters", async () => {
+    const res = await request(tmp).get("/subdir?foo=bar");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+  });
+
+  it("devMiddleware should return 404 for non-existent entry when historyApiFallback is disabled", async () => {
+    const res = await request(tmp)
+      .get("/nonexistent")
+      .set("Accept", "text/html");
+    expect(res.status).not.toBe(200);
+  });
+
   afterAll(() => {
-    tmp = null;
+    tmp = null!;
     vi.restoreAllMocks();
   });
 });
 
 describe("Test plugin's lifecycle - devServer (disabled directory page)", async () => {
-  let tmp
+  let tmp: ReturnType<typeof connect>;
   let entries: Entries;
   const disabledDirOption: MergedPluginOption = {
     entryName: "main.jsx",
     configName: "config.json",
-    enableDevDirectory: false
+    enableDevDirectory: false,
+    historyApiFallback: false
   };
   beforeAll(async () => {
     tmp = connect();
@@ -90,12 +113,197 @@ describe("Test plugin's lifecycle - devServer (disabled directory page)", async 
 
   it("devMiddleware should not generate directory page if plugin options set `enableDevDirectory` to false", async () => {
     const res = await request(tmp).get("/");
-    // When directory page is disabled, root path should NOT contain "Project Directory" title
     expect(res.text).not.toMatch("<title>Project Directory</title>");
   });
 
   afterAll(() => {
-    tmp = null;
+    tmp = null!;
     vi.restoreAllMocks();
+  });
+});
+
+describe("Test plugin's lifecycle - devServer (historyApiFallback enabled)", async () => {
+  let tmp: ReturnType<typeof connect>;
+  let entries: Entries;
+  const fallbackOption: MergedPluginOption = {
+    entryName: "main.jsx",
+    configName: "config.json",
+    enableDevDirectory: true,
+    historyApiFallback: true
+  };
+  beforeAll(async () => {
+    tmp = connect();
+    const viteServer = await createServer({
+      root: path.resolve(__dirname, "example", "src"),
+      server: {
+        middlewareMode: true,
+      },
+      appType: "custom",
+      publicDir: "./public"
+    });
+    entries = new Entries({
+      root: "tests/example/src"
+    }, fallbackOption)
+    tmp.use(viteServer.middlewares);
+    tmp.use(devServerMiddleware(entries, fallbackOption, viteServer));
+  });
+
+  it("devMiddleware should fallback to nearest entry for non-existent paths with HTML accept", async () => {
+    const res = await request(tmp)
+      .get("/subdir/nonexistent-page")
+      .set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+  });
+
+  it("devMiddleware should fallback to root entry for top-level non-existent paths", async () => {
+    const res = await request(tmp)
+      .get("/nonexistent-page")
+      .set("Accept", "text/html");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>This is the rootDir of vite config</title>");
+  });
+
+  it("devMiddleware should fallback to nested entry for deeply nested non-existent paths", async () => {
+    const res = await request(tmp)
+      .get("/subdir/nested/deep/path")
+      .set("Accept", "text/html,application/xhtml+xml");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+  });
+
+  it("devMiddleware should not fallback for non-HTML requests", async () => {
+    const res = await request(tmp)
+      .get("/subdir/nonexistent.js")
+      .set("Accept", "*/*");
+    expect(res.status).not.toBe(200);
+  });
+
+  it("devMiddleware should not fallback when Accept header does not include text/html", async () => {
+    const res = await request(tmp)
+      .get("/subdir/api/data")
+      .set("Accept", "application/json");
+    expect(res.status).not.toBe(200);
+  });
+
+  it("devMiddleware should still return direct matches when historyApiFallback is enabled", async () => {
+    const res = await request(tmp)
+      .get("/subdir")
+      .set("Accept", "text/html");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+  });
+
+  it("devMiddleware should still return .html matches when historyApiFallback is enabled", async () => {
+    const res = await request(tmp)
+      .get("/subdir/index.html")
+      .set("Accept", "text/html");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+  });
+
+  afterAll(() => {
+    tmp = null!;
+    vi.restoreAllMocks();
+  });
+});
+
+describe("Test plugin's lifecycle - devServer (historyApiFallback disabled)", async () => {
+  let tmp: ReturnType<typeof connect>;
+  let entries: Entries;
+  const noFallbackOption: MergedPluginOption = {
+    entryName: "main.jsx",
+    configName: "config.json",
+    enableDevDirectory: true,
+    historyApiFallback: false
+  };
+  beforeAll(async () => {
+    tmp = connect();
+    const viteServer = await createServer({
+      root: path.resolve(__dirname, "example", "src"),
+      server: {
+        middlewareMode: true,
+      },
+      appType: "custom",
+      publicDir: "./public"
+    });
+    entries = new Entries({
+      root: "tests/example/src"
+    }, noFallbackOption)
+    tmp.use(viteServer.middlewares);
+    tmp.use(devServerMiddleware(entries, noFallbackOption, viteServer));
+  });
+
+  it("devMiddleware should not fallback when historyApiFallback is disabled", async () => {
+    const res = await request(tmp)
+      .get("/subdir/nonexistent-page")
+      .set("Accept", "text/html");
+    expect(res.status).not.toBe(200);
+  });
+
+  afterAll(() => {
+    tmp = null!;
+    vi.restoreAllMocks();
+  });
+});
+
+describe("Test backward compatibility - experimental options", async () => {
+  it("should support experimental.historyApiFallback as fallback for top-level", async () => {
+    const optionWithExperimentalFallback: MergedPluginOption = {
+      entryName: "main.jsx",
+      configName: "config.json",
+      enableDevDirectory: true,
+      historyApiFallback: true,
+      experimental: {
+        historyApiFallback: true
+      }
+    };
+
+    const tmp: ReturnType<typeof connect> = connect();
+    const viteServer = await createServer({
+      root: path.resolve(__dirname, "example", "src"),
+      server: { middlewareMode: true },
+      appType: "custom",
+      publicDir: "./public"
+    });
+    const entries = new Entries({ root: "tests/example/src" }, optionWithExperimentalFallback);
+    tmp.use(viteServer.middlewares);
+    tmp.use(devServerMiddleware(entries, optionWithExperimentalFallback, viteServer));
+
+    const res = await request(tmp)
+      .get("/subdir/nonexistent-page")
+      .set("Accept", "text/html");
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch("<title>Minimal React Vite Project</title>");
+
+    await viteServer.close();
+  });
+
+  it("should support experimental.enableDevDirectory as fallback for top-level", async () => {
+    const optionWithExperimentalDir: MergedPluginOption = {
+      entryName: "main.jsx",
+      configName: "config.json",
+      enableDevDirectory: true,
+      historyApiFallback: false,
+      experimental: {
+        enableDevDirectory: true
+      }
+    };
+
+    const tmp: ReturnType<typeof connect> = connect();
+    const viteServer = await createServer({
+      root: path.resolve(__dirname, "example", "src"),
+      server: { middlewareMode: true },
+      appType: "custom",
+      publicDir: "./public"
+    });
+    const entries = new Entries({ root: "tests/example/src" }, optionWithExperimentalDir);
+    tmp.use(viteServer.middlewares);
+    tmp.use(devServerMiddleware(entries, optionWithExperimentalDir, viteServer));
+
+    const res = await request(tmp).get("/");
+    expect(res.text).toMatch("<title>Project Directory</title>");
+
+    await viteServer.close();
   });
 });
