@@ -34,11 +34,10 @@ function findMatchingEntry(entries: Entries, requestPath: string, opt: MergedPlu
   // 移除查询参数和 hash
   const cleanPath = requestPath.split('?')[0].split('#')[0];
   
-  // 检查路径中是否包含 .html（可能在中间位置，用于 history 路由）
+  // 1. 精确匹配 .html 文件
   const htmlIndex = cleanPath.indexOf('.html');
   const hasHtmlInPath = htmlIndex !== -1;
   
-  // 如果路径包含 .html，提取 .html 之前的部分作为入口路径
   if (hasHtmlInPath) {
     const htmlPath = cleanPath.substring(0, htmlIndex + 5); // 包含 .html
     
@@ -56,20 +55,21 @@ function findMatchingEntry(entries: Entries, requestPath: string, opt: MergedPlu
     }
   }
   
-  // 对于不包含 .html 的路径，尝试找到最佳匹配的入口（用于 history 模式）
+  // 2. 匹配入口目录路径（模拟 nginx try_files）
   // 按路径长度排序，优先匹配更具体的路径
   const sortedEntries = [...entries.entries].sort((a, b) => b.value.length - a.value.length);
   
   for (const entry of sortedEntries) {
     const entryPath = entry.value === '.' ? '/' : '/' + entry.value;
     
-    // 检查请求路径是否以入口路径开头
+    // 检查请求路径是否匹配入口路径
+    // /vip-register-mobile/receipt 应该匹配 vip-register-mobile 入口
     if (cleanPath === entryPath || cleanPath.startsWith(entryPath + '/')) {
       return entry;
     }
   }
   
-  // 如果没有匹配，返回根入口（如果存在）
+  // 3. 回退到根入口
   return entries.entries.find(entry => entry.value === '.');
 }
 
@@ -87,9 +87,9 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     
     // 检查是否包含 .html（可能在路径中间，用于 history 路由）
     const hasHtmlInPath = fileUrl.includes('.html');
-    const isRootRequest = fileUrl === "/";
+    // const isRootRequest = fileUrl === "/";
     const hasFileExtension = /\.[a-zA-Z0-9]+$/.test(fileUrl.split('/').pop() || '');
-    const isPotentialSpaRoute = !hasFileExtension && !isRootRequest && !hasHtmlInPath;
+    // const isPotentialSpaRoute = !hasFileExtension && !isRootRequest && !hasHtmlInPath;
     
     // 如果是静态资源请求（有扩展名但不是 .html），交给下一个中间件
     if (hasFileExtension && !hasHtmlInPath) return next();
@@ -104,29 +104,7 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     // 查找匹配的入口
     const foundedEntry = findMatchingEntry(entries, fileUrl, opt);
     
-    if (!foundedEntry) {
-      // 对于 SPA 路由，如果没有找到匹配的入口，尝试返回根入口
-      if (isPotentialSpaRoute) {
-        const rootEntry = entries.entries.find(entry => entry.value === '.');
-        if (rootEntry) {
-          const configUrl = rootEntry.abs + "/" + rootEntry.__options.configName;
-          if (existsSync(configUrl)) {
-            let generatedHtml = await prepareSingleVirtualEntry(rootEntry, opt).catch(e => {
-              console.log(e.message);
-              return null;
-            });
-            
-            if (generatedHtml) {
-              generatedHtml = await server.transformIndexHtml(req.url || "", generatedHtml);
-              res.setHeader("Content-Type", "text/html");
-              res.end(generatedHtml);
-              return;
-            }
-          }
-        }
-      }
-      return next();
-    }
+    if (!foundedEntry) return next();
     
     const configUrl = foundedEntry.abs + "/" + foundedEntry.__options.configName;
     
@@ -143,12 +121,16 @@ export function devServerMiddleware(entries: Entries, opt: MergedPluginOption, s
     
     if (!generatedHtml) return next();
     
-    // 判断是否为 history 模式：
-    // - Hash 模式：路径以 .html 结尾（如 /xxx.html，服务端看不到 # 后面的内容）
-    // - History 模式：路径包含 .html/ （如 /xxx.html/receipt）
-    const isHistoryMode = hasHtmlInPath && !fileUrl.endsWith('.html');
+    // 判断是否需要注入 <base> 标签
+    // 需要注入的情况：
+    // 1. /vip-register-mobile/receipt （纯路径，无 .html）
+    // 2. /vip-register-mobile.html/receipt （.html 在中间）
+    // 不需要注入的情况：
+    // 1. /vip-register-mobile.html （.html 在末尾，hash 模式）
+    const endsWithHtml = fileUrl.endsWith('.html');
+    const needsBaseTag = !endsWithHtml;
     
-    if (isHistoryMode && generatedHtml.includes('<head>')) {
+    if (needsBaseTag && generatedHtml.includes('<head>')) {
       const baseHref = foundedEntry.value === '.' ? '/' : `/${foundedEntry.value}/`;
       generatedHtml = generatedHtml.replace('<head>', `<head>\n    <base href="${baseHref}">`);
     }
