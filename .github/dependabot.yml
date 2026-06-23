@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # esbuild 0.25+ is a breaking change requiring full toolchain upgrade (vite 5+, tsup 8+, vitest 1+)
+    # uuid 11+ requires conventional-changelog-cli 5+ which is a breaking change
+    ignore:
+      - dependency-name: "esbuild"
+        versions: [">0.24.2"]
+      - dependency-name: "conventional-changelog-cli"
+        versions: [">=5.0.0"]
+      - dependency-name: "vitest"
+        versions: [">=0.31.0"]
+    groups:
+      babel:
+        patterns: ["@babel/*"]
+      dev-patches:
+        dependency-type: "development"
+        update-types: ["patch"]
