@@ -7,9 +7,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
@@ -45,20 +45,20 @@
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
-    "@vitejs/plugin-react": "^3.1.0",
-    "@vitest/coverage-c8": "^0.30.1",
+    "@vitejs/plugin-react": "^4.2.3",
+    "@vitest/coverage-v8": "^0.34.6",
     "connect": "^3.7.0",
-    "conventional-changelog-cli": "^2.2.2",
+    "conventional-changelog-cli": "^5.0.0",
     "eslint": "^8.38.0",
     "husky": "^8.0.0",
     "prettier": "^2.8.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "supertest": "^6.3.3",
-    "tsup": "^6.7.0",
+    "tsup": "^8.5.1",
     "typescript": "^4.9.5",
     "vite": "^4.2.3",
-    "vitest": "^0.30.1"
+    "vitest": "^0.34.6"
   },
   "peerDependencies": {
     "brace-expansion": "^2.0.2"
