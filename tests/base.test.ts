@@ -2,11 +2,13 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import Entries from "../src/core";
 import type { MergedPluginOption } from "../src/types";
+import { HandlebarsEngine } from "../src/template-engine";
 
 const pluginOption: MergedPluginOption = {
   entryName: "main.jsx",
   enableDevDirectory: false,
-  historyApiFallback: false
+  historyApiFallback: false,
+  engine: new HandlebarsEngine(),
 };
 
 describe("Test base function - generate entries", () => {

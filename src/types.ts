@@ -1,13 +1,13 @@
-// import type { Options as EjsOption } from "ejs";
-import type Handlebars from 'handlebars'
+import type { TemplateEngine, HandlebarsEngineOptions } from './template-engine'
+import type { HelperDelegate } from 'handlebars'
 
 export type PluginOption = {
     entryName?: string;                 // default:main.js
     configName?: string;                // default:config.json
-    renderEngineOption?: {
-        compileOptions?: CompileOptions,
-        runtimeOptions?: Handlebars.RuntimeOptions
-    };
+    templateEngine?: TemplateEngine;    // custom template engine (overrides renderEngineOption)
+    renderEngineOption?: HandlebarsEngineOptions;  // built-in Handlebars engine options
+    handlebarsHelpers?: Record<string, HelperDelegate>;  // custom Handlebars helpers
+    handlebarsPartials?: Record<string, string>;         // custom Handlebars partials
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
     historyApiFallback?: boolean;       // default:false, enable history API fallback for SPA routing
@@ -26,10 +26,8 @@ export type ExperimentalPluginOption = {
 export type MergedPluginOption = {
     entryName: string;                 // default:main.js
     configName?: string;
-    renderEngineOption?: {
-        compileOptions?: CompileOptions,
-        runtimeOptions?: Handlebars.RuntimeOptions
-    };
+    engine: TemplateEngine;            // resolved template engine instance
+    renderEngineOption?: HandlebarsEngineOptions;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
     historyApiFallback: boolean;        // default:false, enable history API fallback for SPA routing

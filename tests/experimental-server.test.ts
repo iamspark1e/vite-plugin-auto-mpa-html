@@ -6,12 +6,14 @@ import { devServerMiddleware } from "../src/dev-middleware.js";
 import type { MergedPluginOption } from "../src/types.js";
 import path from "path";
 import Entries from "../src/core.js";
+import { HandlebarsEngine } from "../src/template-engine.js";
 
 const pluginOption: MergedPluginOption = {
   entryName: "main.jsx",
   configName: "config.json",
   enableDevDirectory: true,
   historyApiFallback: false,
+  engine: new HandlebarsEngine(),
   experimental: {
     customTemplateName: ".html"
   }
@@ -106,6 +108,7 @@ describe("Test plugin's lifecycle - devServer (experimental mode with historyApi
     configName: "config.json",
     enableDevDirectory: true,
     historyApiFallback: true,
+    engine: new HandlebarsEngine(),
     experimental: {
       customTemplateName: ".html"
     }
@@ -195,6 +198,7 @@ describe("Test plugin's lifecycle - devServer (experimental mode with historyApi
     configName: "config.json",
     enableDevDirectory: true,
     historyApiFallback: false,
+    engine: new HandlebarsEngine(),
     experimental: {
       customTemplateName: ".html"
     }

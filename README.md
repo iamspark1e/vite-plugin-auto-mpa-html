@@ -32,7 +32,6 @@ export default defineConfig({
     entryName: "main.tsx",
     sharedData: {},
     enableDevDirectory: true, // enable directory page will render an directory page at "http://localhost:5173/", if you have an index, it will not be affect.
-    renderEngineOption: {}
   })],
 })
 ```
@@ -122,16 +121,35 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    */
   historyApiFallback?: boolean
   /**
-   * Top-level data, which will be shared to every entry during Handlebars render.
+   * Top-level data, which will be shared to every entry during template render.
    * @default {}
    */
   sharedData?: object
   /**
-   * Render engine options, currently using Handlebars
+   * Custom template engine implementation. When provided, overrides the built-in Handlebars engine.
+   * Must implement the `TemplateEngine` interface: `{ render(templateStr: string, data?: object): string }`
+   * @default undefined (uses built-in HandlebarsEngine)
+   */
+  templateEngine?: TemplateEngine
+  /**
+   * Built-in Handlebars engine options. Ignored when `templateEngine` is provided.
    * @see {@link https://handlebarsjs.com/api-reference/compilation.html}
    * @default {}
    */
-  renderEngineOption?: object
+  renderEngineOption?: {
+    compileOptions?: CompileOptions
+    runtimeOptions?: RuntimeOptions
+  }
+  /**
+   * Register custom Handlebars helpers. Only effective with the built-in Handlebars engine.
+   * @example { eq: (a, b) => a === b, upper: (str) => str.toUpperCase() }
+   */
+  handlebarsHelpers?: Record<string, HelperDelegate>
+  /**
+   * Register custom Handlebars partials. Only effective with the built-in Handlebars engine.
+   * @example { header: '<header>{{title}}</header>', footer: '<footer>© 2024</footer>' }
+   */
+  handlebarsPartials?: Record<string, string>
   /**
    * Entries of your multi-entry application, for example, `main.js` for Vue, and `main.jsx` for React.
    * @default "main.js"
@@ -166,6 +184,56 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
     historyApiFallback?: boolean
   }
 }
+```
+
+### Custom Template Engine
+
+You can provide a custom template engine by implementing the `TemplateEngine` interface:
+
+```typescript
+import autoMpaHtmlPlugin, { HandlebarsEngine } from 'vite-plugin-auto-mpa-html'
+import type { TemplateEngine } from 'vite-plugin-auto-mpa-html'
+
+// Example: using EJS as a custom engine
+import ejs from 'ejs'
+
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  templateEngine: {
+    render: (templateStr, data) => ejs.render(templateStr, data, { async: false })
+  }
+})
+```
+
+### Handlebars Helpers & Partials
+
+Register custom helpers and partials to extend template capabilities:
+
+```typescript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  handlebarsHelpers: {
+    eq: (a, b) => a === b,
+    formatDate: (date) => new Date(date).toLocaleDateString(),
+    upper: (str) => String(str).toUpperCase(),
+  },
+  handlebarsPartials: {
+    header: '<header><h1>{{title}}</h1></header>',
+    footer: '<footer>{{copyright}}</footer>',
+  },
+  sharedData: {
+    copyright: '2024 My Company'
+  }
+})
+```
+
+Then in your templates:
+
+```html
+{{> header}}
+<main>{{#if (eq page "home")}}Welcome!{{/if}}</main>
+<p>Published: {{formatDate publishDate}}</p>
+{{> footer}}
 ```
 
 ## Page Config Option

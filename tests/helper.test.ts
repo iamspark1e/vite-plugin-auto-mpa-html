@@ -3,13 +3,15 @@ import { describe, test, expect, beforeAll, vi, afterEach } from 'vitest'
 import { ColoringConsole, MergedPluginOption } from '../src/types'
 import Entries from '../src/core';
 import { PluginCustomizedError } from '../src/types'
+import { HandlebarsEngine } from '../src/template-engine'
 
 describe('Helpers - genDirectory', () => {
     let entries: Entries;
     const pluginOption: MergedPluginOption = {
         entryName: "main.jsx",
         enableDevDirectory: true,
-        historyApiFallback: false
+        historyApiFallback: false,
+        engine: new HandlebarsEngine(),
     }
     beforeAll(() => {
         entries = new Entries({

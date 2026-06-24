@@ -31,7 +31,6 @@ export default defineConfig({
     entryName: "main.tsx",
     sharedData: {},
     enableDevDirectory: true, // 在dev环境下临时渲染一个目录页面
-    renderEngineOption: {}
   })],
 })
 ```
@@ -120,16 +119,35 @@ export default defineConfig({
    */
   historyApiFallback?: boolean
   /**
-   * 顶层配置的共享数据，在渲染Handlebars时会添加到每个入口处。
+   * 顶层配置的共享数据，在渲染模板时会添加到每个入口处。
    * @default {}
    */
   sharedData?: object
   /**
-   * Handlebars的一些配置选项
+   * 自定义模板引擎实现。提供后将覆盖内置的 Handlebars 引擎。
+   * 需实现 `TemplateEngine` 接口：`{ render(templateStr: string, data?: object): string }`
+   * @default undefined（使用内置 HandlebarsEngine）
+   */
+  templateEngine?: TemplateEngine
+  /**
+   * 内置 Handlebars 引擎选项。当提供 `templateEngine` 时会被忽略。
    * @see {@link https://handlebarsjs.com/zh/api-reference/compilation.html}
    * @default {}
    */
-  renderEngineOption?: object
+  renderEngineOption?: {
+    compileOptions?: CompileOptions
+    runtimeOptions?: RuntimeOptions
+  }
+  /**
+   * 注册自定义 Handlebars helper。仅对内置 Handlebars 引擎生效。
+   * @example { eq: (a, b) => a === b, upper: (str) => str.toUpperCase() }
+   */
+  handlebarsHelpers?: Record<string, HelperDelegate>
+  /**
+   * 注册自定义 Handlebars partial。仅对内置 Handlebars 引擎生效。
+   * @example { header: '<header>{{title}}</header>', footer: '<footer>© 2024</footer>' }
+   */
+  handlebarsPartials?: Record<string, string>
   /**
    * 多页项目的每个入口文件名, 例如, Vue项目一般为`main.js`, React项目一般为`main.jsx`.
    * @default "main.js"
@@ -164,6 +182,56 @@ export default defineConfig({
     historyApiFallback?: boolean
   }
 }
+```
+
+### 自定义模板引擎
+
+你可以通过实现 `TemplateEngine` 接口来提供自定义模板引擎：
+
+```typescript
+import autoMpaHtmlPlugin from 'vite-plugin-auto-mpa-html'
+import type { TemplateEngine } from 'vite-plugin-auto-mpa-html'
+
+// 示例：使用 EJS 作为自定义引擎
+import ejs from 'ejs'
+
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  templateEngine: {
+    render: (templateStr, data) => ejs.render(templateStr, data, { async: false })
+  }
+})
+```
+
+### Handlebars Helpers 与 Partials
+
+注册自定义 helper 和 partial 来扩展模板能力：
+
+```typescript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  handlebarsHelpers: {
+    eq: (a, b) => a === b,
+    formatDate: (date) => new Date(date).toLocaleDateString(),
+    upper: (str) => String(str).toUpperCase(),
+  },
+  handlebarsPartials: {
+    header: '<header><h1>{{title}}</h1></header>',
+    footer: '<footer>{{copyright}}</footer>',
+  },
+  sharedData: {
+    copyright: '2024 My Company'
+  }
+})
+```
+
+在模板中使用：
+
+```html
+{{> header}}
+<main>{{#if (eq page "home")}}Welcome!{{/if}}</main>
+<p>Published: {{formatDate publishDate}}</p>
+{{> footer}}
 ```
 
 ## 页面配置选项

@@ -6,12 +6,14 @@ import { devServerMiddleware } from "../src/dev-middleware.js";
 import type { MergedPluginOption } from "../src/types.js";
 import path from "path";
 import Entries from "../src/core.js";
+import { HandlebarsEngine } from "../src/template-engine.js";
 
 const pluginOption: MergedPluginOption = {
   entryName: "main.jsx",
   configName: "config.json",
   enableDevDirectory: true,
-  historyApiFallback: false
+  historyApiFallback: false,
+  engine: new HandlebarsEngine(),
 };
 
 describe("Test plugin's lifecycle - devServer (basic)", async () => {
@@ -92,7 +94,8 @@ describe("Test plugin's lifecycle - devServer (disabled directory page)", async 
     entryName: "main.jsx",
     configName: "config.json",
     enableDevDirectory: false,
-    historyApiFallback: false
+    historyApiFallback: false,
+    engine: new HandlebarsEngine(),
   };
   beforeAll(async () => {
     tmp = connect();
@@ -129,7 +132,8 @@ describe("Test plugin's lifecycle - devServer (historyApiFallback enabled)", asy
     entryName: "main.jsx",
     configName: "config.json",
     enableDevDirectory: true,
-    historyApiFallback: true
+    historyApiFallback: true,
+    engine: new HandlebarsEngine(),
   };
   beforeAll(async () => {
     tmp = connect();
@@ -215,7 +219,8 @@ describe("Test plugin's lifecycle - devServer (historyApiFallback disabled)", as
     entryName: "main.jsx",
     configName: "config.json",
     enableDevDirectory: true,
-    historyApiFallback: false
+    historyApiFallback: false,
+    engine: new HandlebarsEngine(),
   };
   beforeAll(async () => {
     tmp = connect();
@@ -254,6 +259,7 @@ describe("Test backward compatibility - experimental options", async () => {
       configName: "config.json",
       enableDevDirectory: true,
       historyApiFallback: true,
+      engine: new HandlebarsEngine(),
       experimental: {
         historyApiFallback: true
       }
@@ -285,6 +291,7 @@ describe("Test backward compatibility - experimental options", async () => {
       configName: "config.json",
       enableDevDirectory: true,
       historyApiFallback: false,
+      engine: new HandlebarsEngine(),
       experimental: {
         enableDevDirectory: true
       }

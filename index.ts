@@ -5,6 +5,8 @@ import Entries from './src/core.js'
 import type { PluginOption, PagePluginConfig } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
 import { devServerMiddleware } from './src/dev-middleware.js'
+import { HandlebarsEngine } from './src/template-engine.js'
+import type { TemplateEngine } from './src/template-engine.js'
 import path from 'path'
 
 function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
@@ -18,10 +20,20 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         ...(pluginOption?.experimental ?? {}),
     };
 
+    // Resolve template engine: custom > handlebars with options > default handlebars
+    const engine: TemplateEngine = pluginOption?.templateEngine
+        ?? new HandlebarsEngine({
+            compileOptions: pluginOption?.renderEngineOption?.compileOptions,
+            runtimeOptions: pluginOption?.renderEngineOption?.runtimeOptions,
+            helpers: pluginOption?.handlebarsHelpers,
+            partials: pluginOption?.handlebarsPartials,
+        });
+
     const opt: MergedPluginOption = {
         ...defaultPluginOption,
         ...(pluginOption ? pluginOption : {}),
         entryName: pluginOption?.entryName ?? defaultPluginOption.entryName,
+        engine,
         // Backward compatibility: experimental.enableDevDirectory fallback
         enableDevDirectory: pluginOption?.enableDevDirectory
             ?? pluginOption?.experimental?.enableDevDirectory
@@ -120,5 +132,8 @@ export function pageConfigGenerator(opt: PageAsyncConfigFn): PageAsyncConfigFn
 export function pageConfigGenerator(opt: PageConfigGeneratorTypeExport): PageConfigGeneratorTypeExport {
     return opt
 }
+
+export { HandlebarsEngine } from './src/template-engine.js'
+export type { TemplateEngine, HandlebarsEngineOptions } from './src/template-engine.js'
 
 export default autoMpaHTMLPlugin;
