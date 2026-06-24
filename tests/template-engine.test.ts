@@ -1,7 +1,11 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { HandlebarsEngine } from '../src/template-engine'
-import type { TemplateEngine, HandlebarsEngineOptions } from '../src/template-engine'
-import { __defaultHTMLTemplate } from '../src/template'
+import type { TemplateEngine, TemplateRenderContext } from '../src/template-engine'
+import { __defaultHTMLTemplate, prepareSingleVirtualEntry } from '../src/template'
+import Entries from '../src/core'
+import type { MergedPluginOption } from '../src/types'
+import autoMpaHTMLPlugin from '../index'
+import path from 'path'
 
 describe('HandlebarsEngine - basic rendering', () => {
     it('should render a simple template with data', () => {
@@ -105,6 +109,23 @@ describe('HandlebarsEngine - custom helpers', () => {
         const result = engine.render('{{formatDate date}}', { date: '2024-01-15T10:30:00Z' })
         expect(result).toBe('2024-01-15')
     })
+
+    it('should isolate helpers per engine instance', () => {
+        const engineA = new HandlebarsEngine({
+            helpers: {
+                label: () => 'A',
+            }
+        })
+        const engineB = new HandlebarsEngine({
+            helpers: {
+                label: () => 'B',
+            }
+        })
+
+        expect(engineA.render('{{label this}}')).toBe('A')
+        expect(engineB.render('{{label this}}')).toBe('B')
+        expect(() => new HandlebarsEngine().render('{{label this}}')).toThrow()
+    })
 })
 
 describe('HandlebarsEngine - custom partials', () => {
@@ -177,6 +198,109 @@ describe('TemplateEngine interface - custom implementation', () => {
         expect(result).toBe('rendered:<p>test</p>')
         expect(calls).toHaveLength(1)
         expect(calls[0]).toBe('<p>test</p>')
+    })
+
+    it('should accept an async custom TemplateEngine implementation', async () => {
+        const customEngine: TemplateEngine = {
+            render: async (tpl, data) => {
+                await Promise.resolve()
+                return tpl.replace('{{name}}', String((data as Record<string, string>).name))
+            }
+        }
+
+        await expect(customEngine.render('Hello {{name}}', { name: 'Async' })).resolves.toBe('Hello Async')
+    })
+
+    it('should pass render context to a custom engine during template generation', async () => {
+        let receivedContext: TemplateRenderContext | undefined
+        const pluginOption: MergedPluginOption = {
+            entryName: 'main.jsx',
+            enableDevDirectory: false,
+            historyApiFallback: false,
+            sharedData: { shared: 'yes' },
+            engine: {
+                render: async (_tpl, data, context) => {
+                    receivedContext = context
+                    return `<html><body>${(data as Record<string, string>).title}</body></html>`
+                }
+            },
+        }
+        const entries = new Entries({ root: 'tests/example/src' }, pluginOption)
+        const entry = entries.entries.find(item => item.value === '.')
+
+        expect(entry).toBeDefined()
+        const result = await prepareSingleVirtualEntry(entry!, pluginOption)
+
+        expect(result).toContain('This is the rootDir of vite config')
+        expect(receivedContext?.entry).toBe(entry)
+        expect(receivedContext?.pageConfig.data).toEqual({ title: 'This is the rootDir of vite config' })
+        expect(receivedContext?.pluginOptions).toBe(pluginOption)
+        expect(receivedContext?.templatePath).toBe(path.resolve(entry!.abs, '../templates/handlebars-title.html'))
+    })
+})
+
+describe('Plugin options - Handlebars compatibility', () => {
+    async function renderCompatEntry(pluginOption: Parameters<typeof autoMpaHTMLPlugin>[0]) {
+        const root = path.resolve('tests/example/src')
+        const plugin = autoMpaHTMLPlugin(pluginOption)
+
+        if (typeof plugin.apply === 'function') {
+            plugin.apply({}, { command: 'build', mode: 'test' })
+        }
+        if (typeof plugin.config === 'function') {
+            plugin.config({ root }, { command: 'build', mode: 'test' })
+        }
+        if (typeof plugin.buildStart === 'function') {
+            await plugin.buildStart.call({} as never, {} as never)
+        }
+        return typeof plugin.load === 'function'
+            ? await plugin.load(path.join(root, 'compat/index.html'))
+            : undefined
+    }
+
+    it('should keep old renderEngineOption, handlebarsHelpers, and handlebarsPartials working', async () => {
+        const html = await renderCompatEntry({
+            entryName: 'compat.jsx',
+            renderEngineOption: {
+                compileOptions: { noEscape: true },
+            },
+            handlebarsHelpers: {
+                legacyUpper: (value: string) => String(value).replace('compat', 'COMPAT'),
+            },
+            handlebarsPartials: {
+                legacyFooter: '<footer>{{footer}}</footer>',
+            },
+        })
+
+        expect(html).toContain('<title><strong>COMPAT</strong></title>')
+        expect(html).toContain('<footer>legacy partial</footer>')
+    })
+
+    it('should prefer the new handlebars option object over legacy options', async () => {
+        const html = await renderCompatEntry({
+            entryName: 'compat.jsx',
+            renderEngineOption: {
+                compileOptions: { noEscape: false },
+            },
+            handlebarsHelpers: {
+                legacyUpper: () => 'legacy helper',
+            },
+            handlebarsPartials: {
+                legacyFooter: '<footer>legacy partial</footer>',
+            },
+            handlebars: {
+                compileOptions: { noEscape: true },
+                helpers: {
+                    legacyUpper: (value: string) => String(value).replace('compat', 'NEW'),
+                },
+                partials: {
+                    legacyFooter: '<footer>new partial</footer>',
+                },
+            },
+        })
+
+        expect(html).toContain('<title><strong>NEW</strong></title>')
+        expect(html).toContain('<footer>new partial</footer>')
     })
 })
 

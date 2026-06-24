@@ -1,12 +1,34 @@
 import type { TemplateEngine, HandlebarsEngineOptions } from './template-engine'
-import type { HelperDelegate } from 'handlebars'
+import type { HelperDelegate, RuntimeOptions } from 'handlebars'
+
+export type CompileOptions = {
+    data?: boolean;
+    compat?: boolean;
+    knownHelpers?: { [name: string]: boolean };
+    knownHelpersOnly?: boolean;
+    noEscape?: boolean;
+    strict?: boolean;
+    assumeObjects?: boolean;
+    preventIndent?: boolean;
+    ignoreStandalone?: boolean;
+    explicitPartialContext?: boolean;
+}
+
+export type LegacyRenderEngineOption = {
+    compileOptions?: CompileOptions;
+    runtimeOptions?: RuntimeOptions;
+}
 
 export type PluginOption = {
     entryName?: string;                 // default:main.js
     configName?: string;                // default:config.json
-    templateEngine?: TemplateEngine;    // custom template engine (overrides renderEngineOption)
-    renderEngineOption?: HandlebarsEngineOptions;  // built-in Handlebars engine options
+    templateEngine?: TemplateEngine;    // custom template engine (overrides built-in Handlebars options)
+    handlebars?: HandlebarsEngineOptions;  // built-in Handlebars engine options
+    /** @deprecated Use `handlebars.compileOptions` and `handlebars.runtimeOptions` instead. */
+    renderEngineOption?: LegacyRenderEngineOption;  // built-in Handlebars compile/runtime options
+    /** @deprecated Use `handlebars.helpers` instead. */
     handlebarsHelpers?: Record<string, HelperDelegate>;  // custom Handlebars helpers
+    /** @deprecated Use `handlebars.partials` instead. */
     handlebarsPartials?: Record<string, string>;         // custom Handlebars partials
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
@@ -27,7 +49,8 @@ export type MergedPluginOption = {
     entryName: string;                 // default:main.js
     configName?: string;
     engine: TemplateEngine;            // resolved template engine instance
-    renderEngineOption?: HandlebarsEngineOptions;
+    handlebars?: HandlebarsEngineOptions;
+    renderEngineOption?: LegacyRenderEngineOption;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
     historyApiFallback: boolean;        // default:false, enable history API fallback for SPA routing

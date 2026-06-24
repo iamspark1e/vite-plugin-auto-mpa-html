@@ -125,14 +125,25 @@ export default defineConfig({
   sharedData?: object
   /**
    * 自定义模板引擎实现。提供后将覆盖内置的 Handlebars 引擎。
-   * 需实现 `TemplateEngine` 接口：`{ render(templateStr: string, data?: object): string }`
+   * 需实现 `TemplateEngine` 接口：
+   * `{ render(templateStr: string, data?: object, context?: TemplateRenderContext): string | Promise<string> }`
    * @default undefined（使用内置 HandlebarsEngine）
    */
   templateEngine?: TemplateEngine
   /**
-   * 内置 Handlebars 引擎选项。当提供 `templateEngine` 时会被忽略。
+   * 内置 Handlebars 引擎选项。Handlebars 是稳定的默认模板引擎。
+   * 当提供 `templateEngine` 时会被忽略。
    * @see {@link https://handlebarsjs.com/zh/api-reference/compilation.html}
    * @default {}
+   */
+  handlebars?: {
+    compileOptions?: CompileOptions
+    runtimeOptions?: RuntimeOptions
+    helpers?: Record<string, HelperDelegate>
+    partials?: Record<string, string>
+  }
+  /**
+   * @deprecated 请使用 `handlebars.compileOptions` 和 `handlebars.runtimeOptions`。
    */
   renderEngineOption?: {
     compileOptions?: CompileOptions
@@ -140,11 +151,13 @@ export default defineConfig({
   }
   /**
    * 注册自定义 Handlebars helper。仅对内置 Handlebars 引擎生效。
+   * @deprecated 请使用 `handlebars.helpers`。
    * @example { eq: (a, b) => a === b, upper: (str) => str.toUpperCase() }
    */
   handlebarsHelpers?: Record<string, HelperDelegate>
   /**
    * 注册自定义 Handlebars partial。仅对内置 Handlebars 引擎生效。
+   * @deprecated 请使用 `handlebars.partials`。
    * @example { header: '<header>{{title}}</header>', footer: '<footer>© 2024</footer>' }
    */
   handlebarsPartials?: Record<string, string>
@@ -186,7 +199,7 @@ export default defineConfig({
 
 ### 自定义模板引擎
 
-你可以通过实现 `TemplateEngine` 接口来提供自定义模板引擎：
+Handlebars 是稳定的默认模板引擎。你可以通过实现 `TemplateEngine` 接口来提供自定义模板引擎；提供 `templateEngine` 后，它会覆盖内置 Handlebars 引擎，并忽略所有 `handlebars`、`renderEngineOption`、`handlebarsHelpers` 和 `handlebarsPartials` 选项。
 
 ```typescript
 import autoMpaHtmlPlugin from 'vite-plugin-auto-mpa-html'
@@ -198,26 +211,54 @@ import ejs from 'ejs'
 autoMpaHtmlPlugin({
   entryName: "main.tsx",
   templateEngine: {
-    render: (templateStr, data) => ejs.render(templateStr, data, { async: false })
+    render: async (templateStr, data, context) => {
+      return ejs.render(templateStr, {
+        ...data,
+        templatePath: context?.templatePath,
+      }, { async: true })
+    }
   }
 })
 ```
 
+第三个 `context` 参数包含当前入口、页面配置、已合并的插件选项和模板路径：
+
+```typescript
+import type { TemplateEngine } from 'vite-plugin-auto-mpa-html'
+
+const templateEngine: TemplateEngine = {
+  async render(templateStr, data, context) {
+    console.log(context?.entry.value)
+    console.log(context?.pageConfig.template)
+    console.log(context?.templatePath)
+    return templateStr
+  }
+}
+```
+
 ### Handlebars Helpers 与 Partials
 
-注册自定义 helper 和 partial 来扩展模板能力：
+推荐通过新的 `handlebars` 选项对象注册 helper、partial 和渲染选项：
 
 ```typescript
 autoMpaHtmlPlugin({
   entryName: "main.tsx",
-  handlebarsHelpers: {
-    eq: (a, b) => a === b,
-    formatDate: (date) => new Date(date).toLocaleDateString(),
-    upper: (str) => String(str).toUpperCase(),
-  },
-  handlebarsPartials: {
-    header: '<header><h1>{{title}}</h1></header>',
-    footer: '<footer>{{copyright}}</footer>',
+  handlebars: {
+    compileOptions: {
+      noEscape: false,
+    },
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: false,
+    },
+    helpers: {
+      eq: (a, b) => a === b,
+      formatDate: (date) => new Date(date).toLocaleDateString(),
+      upper: (str) => String(str).toUpperCase(),
+    },
+    partials: {
+      header: '<header><h1>{{title}}</h1></header>',
+      footer: '<footer>{{copyright}}</footer>',
+    },
   },
   sharedData: {
     copyright: '2024 My Company'
@@ -233,6 +274,8 @@ autoMpaHtmlPlugin({
 <p>Published: {{formatDate publishDate}}</p>
 {{> footer}}
 ```
+
+旧的 `renderEngineOption`、`handlebarsHelpers` 和 `handlebarsPartials` 仍然兼容。新项目建议使用 `handlebars`；当新旧选项同时存在时，`handlebars` 中的值优先生效。
 
 ## 页面配置选项
 

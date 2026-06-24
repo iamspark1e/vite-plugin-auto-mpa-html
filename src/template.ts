@@ -26,7 +26,11 @@ export const __defaultHTMLTemplate = `<!DOCTYPE html>
   </body>
 </html>`
 
-export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig) {
+export async function fetchTemplateHTML(
+    entry: EntryPath,
+    pageConfig: PagePluginConfig,
+    pluginOptions: MergedPluginOption
+) {
     let htmlContent;
     const templatePath = pageConfig.template 
         ? path.resolve(entry.abs, pageConfig.template)
@@ -43,9 +47,14 @@ export function fetchTemplateHTML(entry: EntryPath, pageConfig: PagePluginConfig
         _console.error(`Page entry "${entry.abs}", its template cannot be found, using default template as fallback! (${e.message})`)
         htmlContent = __defaultHTMLTemplate
     }
-    htmlContent = entry.__options.engine.render(htmlContent, {
+    htmlContent = await entry.__options.engine.render(htmlContent, {
         ...entry.__options.sharedData,
         ...pageConfig.data,
+    }, {
+        entry,
+        pageConfig,
+        pluginOptions,
+        templatePath,
     });
     const generatedHtml = GENERATED_FLAG.concat(htmlContent).replace(
         "</html>",
@@ -90,7 +99,7 @@ export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: 
         _console.error(`using ${entry.__options.configName} as page config is not supported yet`)
         return "";
     }
-    const generatedHtml = fetchTemplateHTML(entry, pageData)
+    const generatedHtml = await fetchTemplateHTML(entry, pageData, pluginOption)
     const tplPath = path.join(entry.abs, entry.__options.templateName)
     if (existsSync(tplPath)) {
         const fileContent = readFileSync(tplPath, { encoding: "utf-8" });

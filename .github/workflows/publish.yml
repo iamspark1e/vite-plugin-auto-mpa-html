@@ -3,29 +3,44 @@ on:
   push:
     tags:
       - v*
+permissions:
+  contents: write
+  id-token: write
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18.x'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
       - run: npm ci
       - run: npm run build
       - name: Auto Test with Coverage
         run: npm run coverage
       - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: ./coverage
       - name: Create Release and Upload Release Asset
         run: npm i -g github-release-from-changelog && github-release-from-changelog
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Resolve npm dist-tag
+        id: npm-dist-tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ "$VERSION" == *-* ]]; then
+            PRERELEASE="${VERSION#*-}"
+            DIST_TAG="${PRERELEASE%%.*}"
+          else
+            DIST_TAG="latest"
+          fi
+          echo "tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
       - name: Publish to NPMJS
-        run: npm publish
+        run: npm publish --tag "${NPM_TAG}"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          NPM_TAG: ${{ steps.npm-dist-tag.outputs.tag }}

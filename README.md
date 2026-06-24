@@ -127,14 +127,25 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
   sharedData?: object
   /**
    * Custom template engine implementation. When provided, overrides the built-in Handlebars engine.
-   * Must implement the `TemplateEngine` interface: `{ render(templateStr: string, data?: object): string }`
+   * Must implement the `TemplateEngine` interface:
+   * `{ render(templateStr: string, data?: object, context?: TemplateRenderContext): string | Promise<string> }`
    * @default undefined (uses built-in HandlebarsEngine)
    */
   templateEngine?: TemplateEngine
   /**
-   * Built-in Handlebars engine options. Ignored when `templateEngine` is provided.
+   * Built-in Handlebars engine options. Handlebars is the stable default engine.
+   * Ignored when `templateEngine` is provided.
    * @see {@link https://handlebarsjs.com/api-reference/compilation.html}
    * @default {}
+   */
+  handlebars?: {
+    compileOptions?: CompileOptions
+    runtimeOptions?: RuntimeOptions
+    helpers?: Record<string, HelperDelegate>
+    partials?: Record<string, string>
+  }
+  /**
+   * @deprecated Use `handlebars.compileOptions` and `handlebars.runtimeOptions`.
    */
   renderEngineOption?: {
     compileOptions?: CompileOptions
@@ -142,11 +153,13 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
   }
   /**
    * Register custom Handlebars helpers. Only effective with the built-in Handlebars engine.
+   * @deprecated Use `handlebars.helpers`.
    * @example { eq: (a, b) => a === b, upper: (str) => str.toUpperCase() }
    */
   handlebarsHelpers?: Record<string, HelperDelegate>
   /**
    * Register custom Handlebars partials. Only effective with the built-in Handlebars engine.
+   * @deprecated Use `handlebars.partials`.
    * @example { header: '<header>{{title}}</header>', footer: '<footer>© 2024</footer>' }
    */
   handlebarsPartials?: Record<string, string>
@@ -188,7 +201,7 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
 
 ### Custom Template Engine
 
-You can provide a custom template engine by implementing the `TemplateEngine` interface:
+Handlebars is the stable default template engine. You can provide a custom template engine by implementing the `TemplateEngine` interface; when `templateEngine` is provided, it overrides the built-in Handlebars engine and all `handlebars`, `renderEngineOption`, `handlebarsHelpers`, and `handlebarsPartials` options are ignored.
 
 ```typescript
 import autoMpaHtmlPlugin, { HandlebarsEngine } from 'vite-plugin-auto-mpa-html'
@@ -200,26 +213,54 @@ import ejs from 'ejs'
 autoMpaHtmlPlugin({
   entryName: "main.tsx",
   templateEngine: {
-    render: (templateStr, data) => ejs.render(templateStr, data, { async: false })
+    render: async (templateStr, data, context) => {
+      return ejs.render(templateStr, {
+        ...data,
+        templatePath: context?.templatePath,
+      }, { async: true })
+    }
   }
 })
 ```
 
+The third `context` argument includes the current entry, page config, resolved plugin options, and template path:
+
+```typescript
+import type { TemplateEngine } from 'vite-plugin-auto-mpa-html'
+
+const templateEngine: TemplateEngine = {
+  async render(templateStr, data, context) {
+    console.log(context?.entry.value)
+    console.log(context?.pageConfig.template)
+    console.log(context?.templatePath)
+    return templateStr
+  }
+}
+```
+
 ### Handlebars Helpers & Partials
 
-Register custom helpers and partials to extend template capabilities:
+Register custom helpers and partials through the preferred `handlebars` option object:
 
 ```typescript
 autoMpaHtmlPlugin({
   entryName: "main.tsx",
-  handlebarsHelpers: {
-    eq: (a, b) => a === b,
-    formatDate: (date) => new Date(date).toLocaleDateString(),
-    upper: (str) => String(str).toUpperCase(),
-  },
-  handlebarsPartials: {
-    header: '<header><h1>{{title}}</h1></header>',
-    footer: '<footer>{{copyright}}</footer>',
+  handlebars: {
+    compileOptions: {
+      noEscape: false,
+    },
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: false,
+    },
+    helpers: {
+      eq: (a, b) => a === b,
+      formatDate: (date) => new Date(date).toLocaleDateString(),
+      upper: (str) => String(str).toUpperCase(),
+    },
+    partials: {
+      header: '<header><h1>{{title}}</h1></header>',
+      footer: '<footer>{{copyright}}</footer>',
+    },
   },
   sharedData: {
     copyright: '2024 My Company'
@@ -235,6 +276,8 @@ Then in your templates:
 <p>Published: {{formatDate publishDate}}</p>
 {{> footer}}
 ```
+
+The older `renderEngineOption`, `handlebarsHelpers`, and `handlebarsPartials` options still work for backward compatibility. Prefer `handlebars` for new projects; when both are provided, values from `handlebars` take precedence.
 
 ## Page Config Option
 

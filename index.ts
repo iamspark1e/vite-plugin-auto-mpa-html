@@ -6,8 +6,23 @@ import type { PluginOption, PagePluginConfig } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
 import { devServerMiddleware } from './src/dev-middleware.js'
 import { HandlebarsEngine } from './src/template-engine.js'
-import type { TemplateEngine } from './src/template-engine.js'
+import type { HandlebarsEngineOptions, TemplateEngine } from './src/template-engine.js'
 import path from 'path'
+
+function resolveHandlebarsOptions(pluginOption?: PluginOption): HandlebarsEngineOptions {
+    return {
+        compileOptions: pluginOption?.handlebars?.compileOptions ?? pluginOption?.renderEngineOption?.compileOptions,
+        runtimeOptions: pluginOption?.handlebars?.runtimeOptions ?? pluginOption?.renderEngineOption?.runtimeOptions,
+        helpers: {
+            ...(pluginOption?.handlebarsHelpers ?? {}),
+            ...(pluginOption?.handlebars?.helpers ?? {}),
+        },
+        partials: {
+            ...(pluginOption?.handlebarsPartials ?? {}),
+            ...(pluginOption?.handlebars?.partials ?? {}),
+        },
+    }
+}
 
 function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     let config: ResolvedConfig;
@@ -22,12 +37,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
 
     // Resolve template engine: custom > handlebars with options > default handlebars
     const engine: TemplateEngine = pluginOption?.templateEngine
-        ?? new HandlebarsEngine({
-            compileOptions: pluginOption?.renderEngineOption?.compileOptions,
-            runtimeOptions: pluginOption?.renderEngineOption?.runtimeOptions,
-            helpers: pluginOption?.handlebarsHelpers,
-            partials: pluginOption?.handlebarsPartials,
-        });
+        ?? new HandlebarsEngine(resolveHandlebarsOptions(pluginOption));
 
     const opt: MergedPluginOption = {
         ...defaultPluginOption,
@@ -134,6 +144,11 @@ export function pageConfigGenerator(opt: PageConfigGeneratorTypeExport): PageCon
 }
 
 export { HandlebarsEngine } from './src/template-engine.js'
-export type { TemplateEngine, HandlebarsEngineOptions } from './src/template-engine.js'
+export type {
+    TemplateEngine,
+    HandlebarsEngineOptions,
+    TemplateRenderContext,
+    TemplateRenderResult,
+} from './src/template-engine.js'
 
 export default autoMpaHTMLPlugin;
