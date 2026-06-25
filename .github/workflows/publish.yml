@@ -25,17 +25,39 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           directory: ./coverage
-      - name: Create Release and Upload Release Asset
+      - name: Create or update GitHub Release
         shell: bash
         run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          NOTES_FILE="$(mktemp)"
+
+          awk -v version="$VERSION" '
+            $0 ~ "^## \\[" version "\\]" { in_section=1; next }
+            in_section && $0 ~ "^## " { exit }
+            in_section { print }
+          ' CHANGELOG.md > "$NOTES_FILE"
+
+          if [[ ! -s "$NOTES_FILE" ]]; then
+            echo "See CHANGELOG.md for release notes." > "$NOTES_FILE"
+          fi
+
+          RELEASE_FLAGS=()
+          if [[ "$VERSION" == *-* ]]; then
+            RELEASE_FLAGS+=(--prerelease)
+          fi
+
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            echo "Release $GITHUB_REF_NAME already exists; skipping release creation."
+            gh release edit "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes-file "$NOTES_FILE" \
+              "${RELEASE_FLAGS[@]}"
           else
-            npm i -g github-release-from-changelog
-            github-release-from-changelog
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes-file "$NOTES_FILE" \
+              "${RELEASE_FLAGS[@]}"
           fi
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Resolve npm dist-tag
         id: npm-dist-tag
