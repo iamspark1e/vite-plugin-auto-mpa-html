@@ -19,6 +19,6 @@ jobs:
       - name: Auto Test with Coverage
         run: npm run coverage
       - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           directory: ./coverage
