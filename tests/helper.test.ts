@@ -11,6 +11,7 @@ describe('Helpers - genDirectory', () => {
         entryName: "main.jsx",
         enableDevDirectory: true,
         historyApiFallback: false,
+        watchConfig: false,
         engine: new HandlebarsEngine(),
     }
     beforeAll(() => {

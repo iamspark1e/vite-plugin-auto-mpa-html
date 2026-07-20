@@ -33,6 +33,7 @@ export type PluginOption = {
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
     historyApiFallback?: boolean;       // default:false, enable history API fallback for SPA routing
+    watchConfig?: boolean;              // default:true, watch config and template files for changes and trigger full-reload
     experimental?: ExperimentalPluginOption;
 }
 
@@ -54,6 +55,7 @@ export type MergedPluginOption = {
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
     historyApiFallback: boolean;        // default:false, enable history API fallback for SPA routing
+    watchConfig: boolean;               // default:true, watch config and template files for changes and trigger full-reload
     experimental?: ExperimentalPluginOption;
 }
 
@@ -62,6 +64,7 @@ export const defaultPluginOption = {
     configName: "config.json",
     enableDevDirectory: true,
     historyApiFallback: false,
+    watchConfig: true,
     experimental: {}
 }
 

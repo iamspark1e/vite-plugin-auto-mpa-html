@@ -7,6 +7,7 @@ import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
 import { devServerMiddleware } from './src/dev-middleware.js'
 import { HandlebarsEngine } from './src/template-engine.js'
 import type { HandlebarsEngineOptions, TemplateEngine } from './src/template-engine.js'
+import { createConfigWatcher } from './src/config-watcher.js'
 import path from 'path'
 
 function resolveHandlebarsOptions(pluginOption?: PluginOption): HandlebarsEngineOptions {
@@ -52,6 +53,8 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         historyApiFallback: pluginOption?.historyApiFallback
             ?? pluginOption?.experimental?.historyApiFallback
             ?? defaultPluginOption.historyApiFallback,
+        // Config file watching
+        watchConfig: pluginOption?.watchConfig ?? defaultPluginOption.watchConfig,
         experimental,
     }
     let entries: Entries;
@@ -87,6 +90,18 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         },
         configureServer: (server) => {
             server.middlewares.use(devServerMiddleware(entries, opt, server))
+            
+            // Setup config file watching if enabled
+            if (opt.watchConfig) {
+                const configWatcher = createConfigWatcher(entries.entries, opt, server, _console)
+                
+                // Cleanup watcher when server closes
+                const originalClose = server.close.bind(server)
+                server.close = async () => {
+                    configWatcher.stop()
+                    return originalClose()
+                }
+            }
         },
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;

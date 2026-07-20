@@ -13,6 +13,7 @@ const pluginOption: MergedPluginOption = {
   configName: "config.json",
   enableDevDirectory: true,
   historyApiFallback: false,
+  watchConfig: false,
   engine: new HandlebarsEngine(),
   experimental: {
     customTemplateName: ".html"
@@ -108,6 +109,7 @@ describe("Test plugin's lifecycle - devServer (experimental mode with historyApi
     configName: "config.json",
     enableDevDirectory: true,
     historyApiFallback: true,
+    watchConfig: false,
     engine: new HandlebarsEngine(),
     experimental: {
       customTemplateName: ".html"
@@ -198,6 +200,7 @@ describe("Test plugin's lifecycle - devServer (experimental mode with historyApi
     configName: "config.json",
     enableDevDirectory: true,
     historyApiFallback: false,
+    watchConfig: false,
     engine: new HandlebarsEngine(),
     experimental: {
       customTemplateName: ".html"

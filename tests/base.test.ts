@@ -8,6 +8,7 @@ const pluginOption: MergedPluginOption = {
   entryName: "main.jsx",
   enableDevDirectory: false,
   historyApiFallback: false,
+  watchConfig: false,
   engine: new HandlebarsEngine(),
 };
 

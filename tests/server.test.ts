@@ -13,6 +13,7 @@ const pluginOption: MergedPluginOption = {
   configName: "config.json",
   enableDevDirectory: true,
   historyApiFallback: false,
+  watchConfig: false,
   engine: new HandlebarsEngine(),
 };
 
@@ -95,6 +96,7 @@ describe("Test plugin's lifecycle - devServer (disabled directory page)", async 
     configName: "config.json",
     enableDevDirectory: false,
     historyApiFallback: false,
+    watchConfig: false,
     engine: new HandlebarsEngine(),
   };
   beforeAll(async () => {
@@ -133,6 +135,7 @@ describe("Test plugin's lifecycle - devServer (historyApiFallback enabled)", asy
     configName: "config.json",
     enableDevDirectory: true,
     historyApiFallback: true,
+    watchConfig: false,
     engine: new HandlebarsEngine(),
   };
   beforeAll(async () => {
@@ -220,6 +223,7 @@ describe("Test plugin's lifecycle - devServer (historyApiFallback disabled)", as
     configName: "config.json",
     enableDevDirectory: true,
     historyApiFallback: false,
+    watchConfig: false,
     engine: new HandlebarsEngine(),
   };
   beforeAll(async () => {
@@ -259,6 +263,7 @@ describe("Test backward compatibility - experimental options", async () => {
       configName: "config.json",
       enableDevDirectory: true,
       historyApiFallback: true,
+      watchConfig: false,
       engine: new HandlebarsEngine(),
       experimental: {
         historyApiFallback: true
@@ -291,6 +296,7 @@ describe("Test backward compatibility - experimental options", async () => {
       configName: "config.json",
       enableDevDirectory: true,
       historyApiFallback: false,
+      watchConfig: false,
       engine: new HandlebarsEngine(),
       experimental: {
         enableDevDirectory: true

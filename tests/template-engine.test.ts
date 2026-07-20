@@ -217,6 +217,7 @@ describe('TemplateEngine interface - custom implementation', () => {
             entryName: 'main.jsx',
             enableDevDirectory: false,
             historyApiFallback: false,
+            watchConfig: false,
             sharedData: { shared: 'yes' },
             engine: {
                 render: async (_tpl, data, context) => {

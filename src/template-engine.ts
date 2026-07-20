@@ -52,4 +52,8 @@ export class HandlebarsEngine implements TemplateEngine {
         }
         return compiled(data, this.runtimeOptions);
     }
+
+    clearCache(): void {
+        this.cache.clear();
+    }
 }

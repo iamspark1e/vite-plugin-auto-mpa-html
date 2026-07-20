@@ -32,6 +32,7 @@ export default defineConfig({
     entryName: "main.tsx",
     sharedData: {},
     enableDevDirectory: true, // enable directory page will render an directory page at "http://localhost:5173/", if you have an index, it will not be affect.
+    watchConfig: true, // automatically reload when config or template files change (default: true)
   })],
 })
 ```
@@ -120,6 +121,13 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    * @default false
    */
   historyApiFallback?: boolean
+  /**
+   * Watch config and template files for changes and trigger full-reload in development.
+   * When enabled, changes to config.json (or other config files) and HTML templates
+   * will automatically trigger a browser refresh.
+   * @default true
+   */
+  watchConfig?: boolean
   /**
    * Top-level data, which will be shared to every entry during template render.
    * @default {}
@@ -363,15 +371,7 @@ For example, if you have an entry at `/subdir`, accessing `/subdir/any/nested/pa
 
 - When `experimental.customTemplateName` equals ".html" (which means you want to reduce folder levels), it's NOT allowed to put entry files directly under root folder.
 
-- Auto restart when page's config changed is not originally supported by this plugin, but you can use [vite-plugin-restart]() which is maintained by @antfu, and add config like this,
-
-```javascript
-ViteRestart({
-  restart: [
-    'config.[jt]s', // your configuration file name
-  ]
-})
-```
+- **Config file watching**: Since v1.4.0, the plugin supports automatic full-reload when config or template files change during development. This is enabled by default via the `watchConfig` option. You can disable it by setting `watchConfig: false` in your plugin options.
 
 ## Vite native features
 
