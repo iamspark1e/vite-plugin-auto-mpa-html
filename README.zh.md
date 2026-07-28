@@ -4,13 +4,18 @@
   <a href="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html" ><img src="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html/branch/main/graph/badge.svg?token=xW4J4R4P7b"/></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/v/vite-plugin-auto-mpa-html" /></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/dm/vite-plugin-auto-mpa-html" /></a>
-  <img src="https://img.shields.io/badge/Vite-%5E2.9.15%7C%5E3.2.3%7C4-brightgreen" />
+  <img src="https://img.shields.io/badge/Vite-4.2--8-brightgreen" />
+  <img src="https://img.shields.io/badge/Node-20.19%2B%20%7C%2022.12%2B-brightgreen" />
 </p>
 
 <p align='center'><a href="./README.md">English</a> | 中文文档</p>
 <br />
 <p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 Handlebars 的 HTML 模板。</p>
 <br />
+
+## 兼容性
+
+当前版本支持 Node.js 20.19+ 或 22.12+ 环境中的 Vite 4.2 至 Vite 8。兼容性 CI 会将插件打包后安装到隔离项目，并针对每个受支持 Vite 主版本的最新版本验证生产构建和开发服务器。
 
 ## 快速使用
 

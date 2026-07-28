@@ -27,7 +27,7 @@ export default class Entries {
 
     constructor(config: UserConfig, pluginOption: MergedPluginOption) {
         const _console = new ColoringConsole(1)
-        if(pluginOption.experimental) {
+        if(pluginOption.experimental && Object.keys(pluginOption.experimental).length > 0) {
             _console.warn("You are using experimental features which are not stable, features may change without migration or notification!")
         }
         if(pluginOption.experimental && pluginOption.experimental.customTemplateName) {

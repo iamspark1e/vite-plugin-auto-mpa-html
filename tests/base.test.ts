@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterEach, vi } from "vitest";
 import Entries from "../src/core";
 import type { MergedPluginOption } from "../src/types";
 import { HandlebarsEngine } from "../src/template-engine";
@@ -32,3 +32,34 @@ describe("Test base function - generate entries", () => {
     });
   });
 });
+
+describe("Test base function - experimental option warning", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it("should not warn when experimental options are empty", () => {
+    const log = vi.spyOn(console, "log")
+
+    new Entries({ root: "tests/example/src" }, {
+      ...pluginOption,
+      experimental: {},
+    })
+
+    expect(log).not.toHaveBeenCalled()
+  })
+
+  it("should warn when an experimental option is configured", () => {
+    const log = vi.spyOn(console, "log")
+
+    new Entries({ root: "tests/example/src" }, {
+      ...pluginOption,
+      experimental: {
+        rootEntryDistName: "root",
+      },
+    })
+
+    expect(log).toHaveBeenCalledOnce()
+    expect(log).toHaveBeenCalledWith(expect.stringContaining("experimental features"))
+  })
+})

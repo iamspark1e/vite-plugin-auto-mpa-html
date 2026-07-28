@@ -1,3 +1,17 @@
+## [1.4.0-rc.0] - 2026-07-28
+
+### Features
+
+* declare support for Vite 4.2 through Vite 8 on Node.js 20.19+ or 22.12+.
+* add packed-package compatibility smoke tests for production builds and the development server across supported Vite majors.
+* update the entry discovery dependency to the maintained `glob` 13 release.
+
+### Bug Fixes
+
+* use the CommonJS bundle as the legacy `main` entry.
+* avoid warning about experimental features when no experimental option is configured.
+* replace implementation-detail peer dependencies with the supported Vite peer range.
+
 ## [1.4.0-alpha.0] - 2026-06-24
 
 ### Features

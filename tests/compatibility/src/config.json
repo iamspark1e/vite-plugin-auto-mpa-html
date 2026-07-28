@@ -1,0 +1,6 @@
+{
+  "template": "../template.html",
+  "data": {
+    "title": "compatibility smoke test"
+  }
+}

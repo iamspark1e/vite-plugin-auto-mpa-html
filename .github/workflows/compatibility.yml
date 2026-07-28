@@ -1,0 +1,49 @@
+name: Vite compatibility
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    name: Vite ${{ matrix.vite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        vite:
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20.19.0"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Pack plugin
+        id: pack
+        shell: bash
+        run: |
+          PACKAGE_NAME="$(node -p "require('./package.json').name")"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+          echo "tarball=$RUNNER_TEMP/$PACKAGE_NAME-$PACKAGE_VERSION.tgz" >> "$GITHUB_OUTPUT"
+      - name: Prepare isolated compatibility project
+        shell: bash
+        run: cp -R tests/compatibility "$RUNNER_TEMP/compatibility"
+      - name: Install Vite ${{ matrix.vite }}
+        working-directory: ${{ runner.temp }}/compatibility
+        run: npm install --ignore-scripts --no-audit --no-fund "${{ steps.pack.outputs.tarball }}" "vite@${{ matrix.vite }}"
+      - name: Run compatibility smoke test
+        working-directory: ${{ runner.temp }}/compatibility
+        run: node smoke.mjs

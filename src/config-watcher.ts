@@ -38,7 +38,7 @@ export function createConfigWatcher(
     if (uniqueFiles.length === 0) {
         _console.warn('[Config Watcher] No config or template files to watch')
         return {
-            stop: () => {}
+            stop: () => undefined
         }
     }
 

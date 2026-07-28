@@ -4,7 +4,8 @@
   <a href="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html" ><img src="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html/branch/main/graph/badge.svg?token=xW4J4R4P7b"/></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/v/vite-plugin-auto-mpa-html" /></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/dm/vite-plugin-auto-mpa-html" /></a>
-  <img src="https://img.shields.io/badge/Vite-%5E2.9.15%7C%5E3.2.3%7C4%7C5-brightgreen" />
+  <img src="https://img.shields.io/badge/Vite-4.2--8-brightgreen" />
+  <img src="https://img.shields.io/badge/Node-20.19%2B%20%7C%2022.12%2B-brightgreen" />
 </p>
 
 <p align='center'>English | <a href="./README.zh.md">中文文档</a></p>
@@ -12,6 +13,10 @@
 <p align='center'>A file directory-based automated multi-page Vite plugin that supports HTML templates using Handlebars.</p>
 <p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 Handlebars 的 HTML 模板。</p>
 <br />
+
+## Compatibility
+
+This release supports Vite 4.2 through Vite 8 on Node.js 20.19+ or 22.12+. Compatibility CI installs the packed plugin into isolated projects and verifies both production builds and the development server against the latest release of each supported Vite major.
 
 ## Quick Start
 

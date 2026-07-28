@@ -1,8 +1,8 @@
 {
   "name": "vite-plugin-auto-mpa-html",
-  "version": "1.4.0-alpha.1",
+  "version": "1.4.0-rc.0",
   "description": "A file directory-based automated multi-page Vite plugin that supports HTML templates using Handlebars.",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -33,8 +33,11 @@
     "url": "https://github.com/iamspark1e/vite-plugin-auto-mpa-html.git"
   },
   "license": "MIT",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "dependencies": {
-    "glob": "^9.3.1",
+    "glob": "^13.0.6",
     "handlebars": "^4.7.9"
   },
   "devDependencies": {
@@ -62,8 +65,7 @@
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
-    "brace-expansion": "^2.0.2",
-    "handlebars": "^4.7.9"
+    "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
   },
   "overrides": {
     "tsup": {
