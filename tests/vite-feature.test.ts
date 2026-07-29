@@ -15,6 +15,7 @@ describe("Vite native features", () => {
             publicDir: path.resolve(__dirname, 'example', 'public'),
             plugins: [react(), autoMpaHTMLPlugin({
                 entryName: "main.jsx",
+                outputStructure: "page",
             })],
             envDir: path.resolve(__dirname, 'example'),
             build: {
@@ -32,5 +33,10 @@ describe("Vite native features", () => {
         expect(featuredHtml.source).toMatch(
             `<title>AppTitle</title>`
         ); // correctly render Vite mark with given data
+        expect(data.output).toContainEqual(
+            expect.objectContaining({
+                fileName: expect.stringMatching(/^vite-feature\/assets\/vite-feature-[^/]+\.js$/),
+            })
+        )
     })
 })

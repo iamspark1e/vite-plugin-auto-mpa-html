@@ -36,6 +36,7 @@ export default defineConfig({
     entryName: "main.tsx",
     sharedData: {},
     enableDevDirectory: true, // 在dev环境下临时渲染一个目录页面
+    outputStructure: "page", // 可选：生产构建按页面目录组织资源
   })],
 })
 ```
@@ -108,6 +109,39 @@ export default defineConfig({
 
 > 提示，本插件在构建过程中会生成一个临时的`index.html`在各个入口处，请注意避免冲突！
 
+### 按页面组织构建产物
+
+默认的 `outputStructure: "flat"` 保持 Vite 原有的资源布局。如果希望按 `src` 内的页面目录组织生产构建产物，可以启用：
+
+```typescript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  outputStructure: "page",
+  sharedDir: "shared",
+})
+```
+
+例如 `src/page-a/main.tsx` 和 `src/group/page-b/main.tsx` 会生成类似以下结构：
+
+```text
+dist/
+├── page-a/
+│   ├── index.html
+│   └── assets/
+│       └── page-a-[hash].js
+├── group/page-b/
+│   ├── index.html
+│   └── assets/
+│       └── page-b-[hash].js
+└── shared/
+    ├── vendor-[hash].js
+    └── style-[hash].css
+```
+
+插件会将能唯一归属于某个页面的 chunk 和具有源文件信息的资源放入该页面的 `assets` 目录。被多个页面使用、仅来自依赖包或 Rollup/Vite 无法可靠判断页面归属的文件会进入 `sharedDir`，不会为每个页面重复复制。Vite `publicDir` 中的文件仍按 Vite 的规则复制到 `outDir`，不参与分包。
+
+开启该模式后，插件会接管 Rollup 的 `entryFileNames`、`chunkFileNames` 和 `assetFileNames`。其他 `rollupOptions.output` 配置仍会保留；暂不支持同时配置多个 Rollup output。
+
 ## 插件选项
 
 ```typescript
@@ -123,6 +157,17 @@ export default defineConfig({
    * @default false
    */
   historyApiFallback?: boolean
+  /**
+   * 生产资源输出结构。"flat" 保持 Vite 默认布局，"page" 按页面目录组织。
+   * @default "flat"
+   */
+  outputStructure?: "flat" | "page"
+  /**
+   * `outputStructure: "page"` 时，无法唯一归属某个页面的公共资源目录。
+   * 必须是 build.outDir 内的相对目录。
+   * @default "shared"
+   */
+  sharedDir?: string
   /**
    * 顶层配置的共享数据，在渲染模板时会添加到每个入口处。
    * @default {}

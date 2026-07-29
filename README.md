@@ -38,6 +38,7 @@ export default defineConfig({
     sharedData: {},
     enableDevDirectory: true, // enable directory page will render an directory page at "http://localhost:5173/", if you have an index, it will not be affect.
     watchConfig: true, // automatically reload when config or template files change (default: true)
+    outputStructure: "page", // optional: group production assets by page
   })],
 })
 ```
@@ -110,6 +111,39 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
 
 > A temporary `index.html` will be generated to every entry, just beside your entry file, such as `main.jsx` or `main.js`, PLEASE take care!
 
+### Page-oriented build output
+
+The default `outputStructure: "flat"` keeps Vite's existing asset layout. To organize production files using the page directories under `src`, enable:
+
+```typescript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  outputStructure: "page",
+  sharedDir: "shared",
+})
+```
+
+For example, `src/page-a/main.tsx` and `src/group/page-b/main.tsx` produce a layout similar to:
+
+```text
+dist/
+├── page-a/
+│   ├── index.html
+│   └── assets/
+│       └── page-a-[hash].js
+├── group/page-b/
+│   ├── index.html
+│   └── assets/
+│       └── page-b-[hash].js
+└── shared/
+    ├── vendor-[hash].js
+    └── style-[hash].css
+```
+
+Chunks and source assets that can be assigned to exactly one page are emitted in that page's `assets` directory. Files shared by multiple pages, dependency-only files, and generated assets whose owning page cannot be determined reliably are emitted in `sharedDir` without being duplicated. Files from Vite's `publicDir` continue to be copied to `outDir` according to Vite's normal rules and are not repartitioned.
+
+In this mode the plugin controls Rollup's `entryFileNames`, `chunkFileNames`, and `assetFileNames`. Other `rollupOptions.output` settings are preserved; multiple Rollup outputs are not currently supported.
+
 ## Plugin Options
 
 ```typescript
@@ -133,6 +167,18 @@ Finished, everything is ready, run `npm run build` to see what is built with `vi
    * @default true
    */
   watchConfig?: boolean
+  /**
+   * Production asset layout. "flat" keeps Vite's default layout;
+   * "page" groups page-owned files beside each page.
+   * @default "flat"
+   */
+  outputStructure?: "flat" | "page"
+  /**
+   * Directory for files that cannot be assigned to exactly one page when using page output.
+   * Must be a relative directory inside build.outDir.
+   * @default "shared"
+   */
+  sharedDir?: string
   /**
    * Top-level data, which will be shared to every entry during template render.
    * @default {}

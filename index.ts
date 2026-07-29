@@ -8,6 +8,7 @@ import { devServerMiddleware } from './src/dev-middleware.js'
 import { HandlebarsEngine } from './src/template-engine.js'
 import type { HandlebarsEngineOptions, TemplateEngine } from './src/template-engine.js'
 import { createConfigWatcher } from './src/config-watcher.js'
+import { createPageOutput } from './src/output.js'
 import path from 'path'
 
 function resolveHandlebarsOptions(pluginOption?: PluginOption): HandlebarsEngineOptions {
@@ -55,6 +56,8 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             ?? defaultPluginOption.historyApiFallback,
         // Config file watching
         watchConfig: pluginOption?.watchConfig ?? defaultPluginOption.watchConfig,
+        outputStructure: pluginOption?.outputStructure ?? defaultPluginOption.outputStructure,
+        sharedDir: pluginOption?.sharedDir ?? defaultPluginOption.sharedDir,
         experimental,
     }
     let entries: Entries;
@@ -111,7 +114,16 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             if (entries.entries.length === 0) {
                 _console.fatal("0 entry detected! Please check plugin's option in Vite config file.")
             }
+            if (
+                opt.outputStructure === 'page'
+                && Array.isArray(config.build?.rollupOptions?.output)
+            ) {
+                _console.fatal(
+                    'outputStructure: "page" does not support an array of Rollup output options. Use a single output object instead.'
+                )
+            }
             const input: { [key: string]: string } = {}
+            const entryNames = new Map<string, string>()
             entries.entries.forEach(entry => {
                 let entryName = entry.value;
                 if (entryName === "" || entryName === ".") {
@@ -121,6 +133,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                         entryName = opt.experimental?.rootEntryDistName || "_root";
                     }
                 }
+                entryNames.set(entryName.replace(/\\/g, '/'), entry.value === '.' ? '' : entry.value.replace(/\\/g, '/'))
                 // input[entryName] = entry.abs + entry.__options.templateName
                 input[entryName] = PREFIX + path.join(entry.abs, entry.__options.templateName)
             })
@@ -128,7 +141,16 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             let generatedConfig: UserConfig = {
                 build: {
                     rollupOptions: {
-                        input
+                        input,
+                        ...(opt.outputStructure === 'page'
+                            ? {
+                                output: createPageOutput(
+                                    entries.entries,
+                                    entryNames,
+                                    opt.sharedDir,
+                                ),
+                            }
+                            : {}),
                     }
                 }
             }

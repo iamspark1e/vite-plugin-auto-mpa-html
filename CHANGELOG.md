@@ -1,3 +1,10 @@
+## [1.4.0-rc.1] - 2026-07-29
+
+### Features
+
+* add an opt-in page-oriented production output layout with configurable shared asset directory.
+* keep page-owned chunks and source assets beside their HTML page while centralizing ambiguous and shared files without duplication.
+
 ## [1.4.0-rc.0] - 2026-07-28
 
 ### Features

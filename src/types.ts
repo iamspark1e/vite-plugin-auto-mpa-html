@@ -34,6 +34,15 @@ export type PluginOption = {
     enableDevDirectory?: boolean;
     historyApiFallback?: boolean;       // default:false, enable history API fallback for SPA routing
     watchConfig?: boolean;              // default:true, watch config and template files for changes and trigger full-reload
+    /**
+     * Production asset layout.
+     * - `flat`: keep Vite's default asset layout.
+     * - `page`: place page-owned chunks/assets beside their page and shared files in `sharedDir`.
+     * @default "flat"
+     */
+    outputStructure?: "flat" | "page";
+    /** Directory for chunks/assets that cannot be assigned to a single page. @default "shared" */
+    sharedDir?: string;
     experimental?: ExperimentalPluginOption;
 }
 
@@ -56,6 +65,8 @@ export type MergedPluginOption = {
     enableDevDirectory: boolean;
     historyApiFallback: boolean;        // default:false, enable history API fallback for SPA routing
     watchConfig: boolean;               // default:true, watch config and template files for changes and trigger full-reload
+    outputStructure?: "flat" | "page";
+    sharedDir?: string;
     experimental?: ExperimentalPluginOption;
 }
 
@@ -65,6 +76,8 @@ export const defaultPluginOption = {
     enableDevDirectory: true,
     historyApiFallback: false,
     watchConfig: true,
+    outputStructure: "flat" as const,
+    sharedDir: "shared",
     experimental: {}
 }
 
