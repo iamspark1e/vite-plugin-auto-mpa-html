@@ -1,3 +1,9 @@
+## [1.4.0-rc.2] - 2026-07-30
+
+### Bug Fixes
+
+* resolve flattened `.html` virtual entries beside their page directory so injected entry scripts do not contain a duplicated page path.
+
 ## [1.4.0-rc.1] - 2026-07-29
 
 ### Features

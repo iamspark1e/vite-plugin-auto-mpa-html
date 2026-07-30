@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { MergedPluginOption, defaultPluginOption, ColoringConsole } from './src/types.js'
-import { cleanTempEntries, prepareVirtualEntries } from './src/template.js'
+import { cleanTempEntries, prepareVirtualEntries, resolveEntryTemplatePath } from './src/template.js'
 import Entries from './src/core.js'
 import type { PluginOption, PagePluginConfig } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
@@ -135,7 +135,7 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                 }
                 entryNames.set(entryName.replace(/\\/g, '/'), entry.value === '.' ? '' : entry.value.replace(/\\/g, '/'))
                 // input[entryName] = entry.abs + entry.__options.templateName
-                input[entryName] = PREFIX + path.join(entry.abs, entry.__options.templateName)
+                input[entryName] = PREFIX + resolveEntryTemplatePath(entry)
             })
 
             let generatedConfig: UserConfig = {

@@ -4,6 +4,7 @@ import type { ViteDevServer } from 'vite'
 import type { EntryPath } from './core.js'
 import type { MergedPluginOption, ColoringConsole } from './types.js'
 import type { FSWatcher } from 'chokidar'
+import { resolveEntryTemplatePath } from './template.js'
 
 export interface ConfigWatcher {
     stop: () => void
@@ -28,7 +29,7 @@ export function createConfigWatcher(
 
         // Add template file (if it exists and is not the default)
         // We'll add the template path even if it doesn't exist yet, so we can watch for its creation
-        const templatePath = path.join(entry.abs, entry.__options.templateName)
+        const templatePath = resolveEntryTemplatePath(entry)
         filesToWatch.push(templatePath)
     })
 
