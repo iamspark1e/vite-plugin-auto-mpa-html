@@ -1,8 +1,8 @@
 import path from "path";
-import pkg from 'glob';
+import { globSync } from 'glob';
 import { UserConfig } from "vite";
 import { ColoringConsole, MergedPluginOption } from "./types";
-const { globSync } = pkg;
+import type { TemplateEngine } from "./template-engine";
 
 export type EntryPath = {
     value: string;
@@ -15,7 +15,7 @@ type EntryPathOption = {
     templateName: string;
     entryName: string;
     sharedData?: object
-    renderEngineOption?: object;
+    engine: TemplateEngine;
 }
 
 export default class Entries {
@@ -27,7 +27,7 @@ export default class Entries {
 
     constructor(config: UserConfig, pluginOption: MergedPluginOption) {
         const _console = new ColoringConsole(1)
-        if(pluginOption.experimental) {
+        if(pluginOption.experimental && Object.keys(pluginOption.experimental).length > 0) {
             _console.warn("You are using experimental features which are not stable, features may change without migration or notification!")
         }
         if(pluginOption.experimental && pluginOption.experimental.customTemplateName) {
@@ -50,7 +50,7 @@ export default class Entries {
                     templateName: this.templateName,
                     entryName: this.entryName,
                     sharedData: pluginOption.sharedData,
-                    renderEngineOption: pluginOption.renderEngineOption,
+                    engine: pluginOption.engine,
                 }
             }
             this.entries.push(fullDirname)

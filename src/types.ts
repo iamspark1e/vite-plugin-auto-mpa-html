@@ -1,32 +1,72 @@
-// import type { Options as EjsOption } from "ejs";
-import type Handlebars from 'handlebars'
+import type { TemplateEngine, HandlebarsEngineOptions } from './template-engine'
+import type { HelperDelegate, RuntimeOptions } from 'handlebars'
+
+export type CompileOptions = {
+    data?: boolean;
+    compat?: boolean;
+    knownHelpers?: { [name: string]: boolean };
+    knownHelpersOnly?: boolean;
+    noEscape?: boolean;
+    strict?: boolean;
+    assumeObjects?: boolean;
+    preventIndent?: boolean;
+    ignoreStandalone?: boolean;
+    explicitPartialContext?: boolean;
+}
+
+export type LegacyRenderEngineOption = {
+    compileOptions?: CompileOptions;
+    runtimeOptions?: RuntimeOptions;
+}
 
 export type PluginOption = {
     entryName?: string;                 // default:main.js
     configName?: string;                // default:config.json
-    renderEngineOption?: {
-        compileOptions?: CompileOptions,
-        runtimeOptions?: Handlebars.RuntimeOptions
-    };
+    templateEngine?: TemplateEngine;    // custom template engine (overrides built-in Handlebars options)
+    handlebars?: HandlebarsEngineOptions;  // built-in Handlebars engine options
+    /** @deprecated Use `handlebars.compileOptions` and `handlebars.runtimeOptions` instead. */
+    renderEngineOption?: LegacyRenderEngineOption;  // built-in Handlebars compile/runtime options
+    /** @deprecated Use `handlebars.helpers` instead. */
+    handlebarsHelpers?: Record<string, HelperDelegate>;  // custom Handlebars helpers
+    /** @deprecated Use `handlebars.partials` instead. */
+    handlebarsPartials?: Record<string, string>;         // custom Handlebars partials
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory?: boolean;
+    historyApiFallback?: boolean;       // default:false, enable history API fallback for SPA routing
+    watchConfig?: boolean;              // default:true, watch config and template files for changes and trigger full-reload
+    /**
+     * Production asset layout.
+     * - `flat`: keep Vite's default asset layout.
+     * - `page`: place page-owned chunks/assets beside their page and shared files in `sharedDir`.
+     * @default "flat"
+     */
+    outputStructure?: "flat" | "page";
+    /** Directory for chunks/assets that cannot be assigned to a single page. @default "shared" */
+    sharedDir?: string;
     experimental?: ExperimentalPluginOption;
 }
 
 export type ExperimentalPluginOption = {
     customTemplateName?: string;
-    rootEntryDistName?: string; // if an entry is placed at the root folder of vite config's `root`, you can change its name, use "_root" as default. 
+    rootEntryDistName?: string; // if an entry is placed at the root folder of vite config's `root`, you can change its name, use "_root" as default.
+    /** @deprecated Use top-level `enableDevDirectory` instead. This will be removed when experimental options are deprecated. */
+    enableDevDirectory?: boolean;
+    /** @deprecated Use top-level `historyApiFallback` instead. This will be removed when experimental options are deprecated. */
+    historyApiFallback?: boolean;
 }
 
 export type MergedPluginOption = {
     entryName: string;                 // default:main.js
     configName?: string;
-    renderEngineOption?: {
-        compileOptions?: CompileOptions,
-        runtimeOptions?: Handlebars.RuntimeOptions
-    };
+    engine: TemplateEngine;            // resolved template engine instance
+    handlebars?: HandlebarsEngineOptions;
+    renderEngineOption?: LegacyRenderEngineOption;
     sharedData?: object;                // will be merged into every page's data
     enableDevDirectory: boolean;
+    historyApiFallback: boolean;        // default:false, enable history API fallback for SPA routing
+    watchConfig: boolean;               // default:true, watch config and template files for changes and trigger full-reload
+    outputStructure?: "flat" | "page";
+    sharedDir?: string;
     experimental?: ExperimentalPluginOption;
 }
 
@@ -34,6 +74,10 @@ export const defaultPluginOption = {
     entryName: "main.js",
     configName: "config.json",
     enableDevDirectory: true,
+    historyApiFallback: false,
+    watchConfig: true,
+    outputStructure: "flat" as const,
+    sharedDir: "shared",
     experimental: {}
 }
 

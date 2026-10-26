@@ -1,0 +1,7 @@
+{
+    "template": "../../templates/compat.html",
+    "data": {
+        "title": "<strong>compat</strong>",
+        "footer": "legacy partial"
+    }
+}

@@ -1,21 +1,67 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { MergedPluginOption, defaultPluginOption, ColoringConsole } from './src/types.js'
-import { cleanTempEntries, prepareVirtualEntries } from './src/template.js'
+import { cleanTempEntries, prepareVirtualEntries, resolveEntryTemplatePath } from './src/template.js'
 import Entries from './src/core.js'
 import type { PluginOption, PagePluginConfig } from './src/types.js'
 import type { Plugin, ResolvedConfig, UserConfig } from 'vite'
 import { devServerMiddleware } from './src/dev-middleware.js'
+import { HandlebarsEngine } from './src/template-engine.js'
+import type { HandlebarsEngineOptions, TemplateEngine } from './src/template-engine.js'
+import { createConfigWatcher } from './src/config-watcher.js'
+import { createPageOutput } from './src/output.js'
 import path from 'path'
+
+function resolveHandlebarsOptions(pluginOption?: PluginOption): HandlebarsEngineOptions {
+    return {
+        compileOptions: pluginOption?.handlebars?.compileOptions ?? pluginOption?.renderEngineOption?.compileOptions,
+        runtimeOptions: pluginOption?.handlebars?.runtimeOptions ?? pluginOption?.renderEngineOption?.runtimeOptions,
+        helpers: {
+            ...(pluginOption?.handlebarsHelpers ?? {}),
+            ...(pluginOption?.handlebars?.helpers ?? {}),
+        },
+        partials: {
+            ...(pluginOption?.handlebarsPartials ?? {}),
+            ...(pluginOption?.handlebars?.partials ?? {}),
+        },
+    }
+}
 
 function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
     let config: ResolvedConfig;
+    const _console = new ColoringConsole(1);
+
+    // Merge experimental options with backward compatibility
+    // experimental options act as fallback when top-level options are not set
+    const experimental = {
+        ...defaultPluginOption.experimental,
+        ...(pluginOption?.experimental ?? {}),
+    };
+
+    // Resolve template engine: custom > handlebars with options > default handlebars
+    const engine: TemplateEngine = pluginOption?.templateEngine
+        ?? new HandlebarsEngine(resolveHandlebarsOptions(pluginOption));
+
     const opt: MergedPluginOption = {
         ...defaultPluginOption,
-        ...(pluginOption ? pluginOption : {})
+        ...(pluginOption ? pluginOption : {}),
+        entryName: pluginOption?.entryName ?? defaultPluginOption.entryName,
+        engine,
+        // Backward compatibility: experimental.enableDevDirectory fallback
+        enableDevDirectory: pluginOption?.enableDevDirectory
+            ?? pluginOption?.experimental?.enableDevDirectory
+            ?? defaultPluginOption.enableDevDirectory,
+        // Backward compatibility: experimental.historyApiFallback fallback
+        historyApiFallback: pluginOption?.historyApiFallback
+            ?? pluginOption?.experimental?.historyApiFallback
+            ?? defaultPluginOption.historyApiFallback,
+        // Config file watching
+        watchConfig: pluginOption?.watchConfig ?? defaultPluginOption.watchConfig,
+        outputStructure: pluginOption?.outputStructure ?? defaultPluginOption.outputStructure,
+        sharedDir: pluginOption?.sharedDir ?? defaultPluginOption.sharedDir,
+        experimental,
     }
     let entries: Entries;
     let cmd: string;
-    const _console = new ColoringConsole(1);
     const PREFIX = '\0virtual-auto-mpa-html:'
     let virtualMap: Map<string, string>;
     return {
@@ -47,6 +93,18 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
         },
         configureServer: (server) => {
             server.middlewares.use(devServerMiddleware(entries, opt, server))
+            
+            // Setup config file watching if enabled
+            if (opt.watchConfig) {
+                const configWatcher = createConfigWatcher(entries.entries, opt, server, _console)
+                
+                // Cleanup watcher when server closes
+                const originalClose = server.close.bind(server)
+                server.close = async () => {
+                    configWatcher.stop()
+                    return originalClose()
+                }
+            }
         },
         configResolved: (resolvedConfig: ResolvedConfig) => {
             config = resolvedConfig;
@@ -56,7 +114,16 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
             if (entries.entries.length === 0) {
                 _console.fatal("0 entry detected! Please check plugin's option in Vite config file.")
             }
+            if (
+                opt.outputStructure === 'page'
+                && Array.isArray(config.build?.rollupOptions?.output)
+            ) {
+                _console.fatal(
+                    'outputStructure: "page" does not support an array of Rollup output options. Use a single output object instead.'
+                )
+            }
             const input: { [key: string]: string } = {}
+            const entryNames = new Map<string, string>()
             entries.entries.forEach(entry => {
                 let entryName = entry.value;
                 if (entryName === "" || entryName === ".") {
@@ -66,14 +133,24 @@ function autoMpaHTMLPlugin(pluginOption?: PluginOption): Plugin {
                         entryName = opt.experimental?.rootEntryDistName || "_root";
                     }
                 }
+                entryNames.set(entryName.replace(/\\/g, '/'), entry.value === '.' ? '' : entry.value.replace(/\\/g, '/'))
                 // input[entryName] = entry.abs + entry.__options.templateName
-                input[entryName] = PREFIX + entry.abs + entry.__options.templateName
+                input[entryName] = PREFIX + resolveEntryTemplatePath(entry)
             })
 
             let generatedConfig: UserConfig = {
                 build: {
                     rollupOptions: {
-                        input
+                        input,
+                        ...(opt.outputStructure === 'page'
+                            ? {
+                                output: createPageOutput(
+                                    entries.entries,
+                                    entryNames,
+                                    opt.sharedDir,
+                                ),
+                            }
+                            : {}),
                     }
                 }
             }
@@ -102,5 +179,13 @@ export function pageConfigGenerator(opt: PageAsyncConfigFn): PageAsyncConfigFn
 export function pageConfigGenerator(opt: PageConfigGeneratorTypeExport): PageConfigGeneratorTypeExport {
     return opt
 }
+
+export { HandlebarsEngine } from './src/template-engine.js'
+export type {
+    TemplateEngine,
+    HandlebarsEngineOptions,
+    TemplateRenderContext,
+    TemplateRenderResult,
+} from './src/template-engine.js'
 
 export default autoMpaHTMLPlugin;

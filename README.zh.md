@@ -4,13 +4,18 @@
   <a href="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html" ><img src="https://codecov.io/gh/iamspark1e/vite-plugin-auto-mpa-html/branch/main/graph/badge.svg?token=xW4J4R4P7b"/></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/v/vite-plugin-auto-mpa-html" /></a>
   <a href="https://www.npmjs.com/package/vite-plugin-auto-mpa-html"><img src="https://img.shields.io/npm/dm/vite-plugin-auto-mpa-html" /></a>
-  <img src="https://img.shields.io/badge/Vite-%5E2.9.15%7C%5E3.2.3%7C4-brightgreen" />
+  <img src="https://img.shields.io/badge/Vite-4.2--8-brightgreen" />
+  <img src="https://img.shields.io/badge/Node-20.19%2B%20%7C%2022.12%2B-brightgreen" />
 </p>
 
 <p align='center'><a href="./README.md">English</a> | 中文文档</p>
 <br />
 <p align='center'>基于文件目录的Vite自动化多页面构建插件，支持使用 Handlebars 的 HTML 模板。</p>
 <br />
+
+## 兼容性
+
+当前版本支持 Node.js 20.19+ 或 22.12+ 环境中的 Vite 4.2 至 Vite 8。兼容性 CI 会将插件打包后安装到隔离项目，并针对每个受支持 Vite 主版本的最新版本验证生产构建和开发服务器。
 
 ## 快速使用
 
@@ -31,7 +36,7 @@ export default defineConfig({
     entryName: "main.tsx",
     sharedData: {},
     enableDevDirectory: true, // 在dev环境下临时渲染一个目录页面
-    renderEngineOption: {}
+    outputStructure: "page", // 可选：生产构建按页面目录组织资源
   })],
 })
 ```
@@ -45,28 +50,28 @@ export default defineConfig({
 ├── package.json
 ├── package-lock.json
 ├── public
-│   └── vite.svg
+│   └── vite.svg
 ├── src
-│   ├── index
-│   │   ├── App.css
-│   │   ├── App.tsx
-│   │   ├── assets
-│   │   │   └── react.svg
-│   │   ├── config.json
-│   │   ├── index.css
-│   │   ├── main.tsx
-│   │   └── vite-env.d.ts
-│   └── page2
-│       ├── App.css
-│       ├── App.tsx
-│       ├── assets
-│       │   └── react.svg
-│       ├── config.json
-│       ├── index.css
-│       ├── main.tsx
-│       └── vite-env.d.ts
+│   ├── index
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── assets
+│   │   │   └── react.svg
+│   │   ├── config.json
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   └── page2
+│       ├── App.css
+│       ├── App.tsx
+│       ├── assets
+│       │   └── react.svg
+│       ├── config.json
+│       ├── index.css
+│       ├── main.tsx
+│       └── vite-env.d.ts
 ├── templates
-│   └── index.html
+│   └── index.html
 ├── tsconfig.json
 ├── tsconfig.node.json
 └── vite.config.ts
@@ -104,7 +109,40 @@ export default defineConfig({
 
 > 提示，本插件在构建过程中会生成一个临时的`index.html`在各个入口处，请注意避免冲突！
 
-## Plugin Options
+### 按页面组织构建产物
+
+默认的 `outputStructure: "flat"` 保持 Vite 原有的资源布局。如果希望按 `src` 内的页面目录组织生产构建产物，可以启用：
+
+```typescript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  outputStructure: "page",
+  sharedDir: "shared",
+})
+```
+
+例如 `src/page-a/main.tsx` 和 `src/group/page-b/main.tsx` 会生成类似以下结构：
+
+```text
+dist/
+├── page-a/
+│   ├── index.html
+│   └── assets/
+│       └── page-a-[hash].js
+├── group/page-b/
+│   ├── index.html
+│   └── assets/
+│       └── page-b-[hash].js
+└── shared/
+    ├── vendor-[hash].js
+    └── style-[hash].css
+```
+
+插件会将能唯一归属于某个页面的 chunk 和具有源文件信息的资源放入该页面的 `assets` 目录。被多个页面使用、仅来自依赖包或 Rollup/Vite 无法可靠判断页面归属的文件会进入 `sharedDir`，不会为每个页面重复复制。Vite `publicDir` 中的文件仍按 Vite 的规则复制到 `outDir`，不参与分包。
+
+开启该模式后，插件会接管 Rollup 的 `entryFileNames`、`chunkFileNames` 和 `assetFileNames`。其他 `rollupOptions.output` 配置仍会保留；暂不支持同时配置多个 Rollup output。
+
+## 插件选项
 
 ```typescript
 {
@@ -114,16 +152,65 @@ export default defineConfig({
    */
   enableDevDirectory?: boolean
   /**
-   * 顶层配置的共享数据，在渲染Handlebars时会添加到每个入口处。
+   * 开启 history API fallback，用于开发环境下的 SPA 路由。
+   * 开启后，对于不存在的路径请求，如果 Accept 头包含 "text/html"，会自动回退到最近的入口 HTML。
+   * @default false
+   */
+  historyApiFallback?: boolean
+  /**
+   * 生产资源输出结构。"flat" 保持 Vite 默认布局，"page" 按页面目录组织。
+   * @default "flat"
+   */
+  outputStructure?: "flat" | "page"
+  /**
+   * `outputStructure: "page"` 时，无法唯一归属某个页面的公共资源目录。
+   * 必须是 build.outDir 内的相对目录。
+   * @default "shared"
+   */
+  sharedDir?: string
+  /**
+   * 顶层配置的共享数据，在渲染模板时会添加到每个入口处。
    * @default {}
    */
   sharedData?: object
   /**
-   * Handlebars的一些配置选项
+   * 自定义模板引擎实现。提供后将覆盖内置的 Handlebars 引擎。
+   * 需实现 `TemplateEngine` 接口：
+   * `{ render(templateStr: string, data?: object, context?: TemplateRenderContext): string | Promise<string> }`
+   * @default undefined（使用内置 HandlebarsEngine）
+   */
+  templateEngine?: TemplateEngine
+  /**
+   * 内置 Handlebars 引擎选项。Handlebars 是稳定的默认模板引擎。
+   * 当提供 `templateEngine` 时会被忽略。
    * @see {@link https://handlebarsjs.com/zh/api-reference/compilation.html}
    * @default {}
    */
-  renderEngineOption?: object
+  handlebars?: {
+    compileOptions?: CompileOptions
+    runtimeOptions?: RuntimeOptions
+    helpers?: Record<string, HelperDelegate>
+    partials?: Record<string, string>
+  }
+  /**
+   * @deprecated 请使用 `handlebars.compileOptions` 和 `handlebars.runtimeOptions`。
+   */
+  renderEngineOption?: {
+    compileOptions?: CompileOptions
+    runtimeOptions?: RuntimeOptions
+  }
+  /**
+   * 注册自定义 Handlebars helper。仅对内置 Handlebars 引擎生效。
+   * @deprecated 请使用 `handlebars.helpers`。
+   * @example { eq: (a, b) => a === b, upper: (str) => str.toUpperCase() }
+   */
+  handlebarsHelpers?: Record<string, HelperDelegate>
+  /**
+   * 注册自定义 Handlebars partial。仅对内置 Handlebars 引擎生效。
+   * @deprecated 请使用 `handlebars.partials`。
+   * @example { header: '<header>{{title}}</header>', footer: '<footer>© 2024</footer>' }
+   */
+  handlebarsPartials?: Record<string, string>
   /**
    * 多页项目的每个入口文件名, 例如, Vue项目一般为`main.js`, React项目一般为`main.jsx`.
    * @default "main.js"
@@ -135,7 +222,8 @@ export default defineConfig({
    */
   configName?: string
   /**
-   * 测试特性，键值可能会在版本更新时有改动，请注意！
+   * 实验性功能，使用风险自负！
+   * 注意：experimental 选项将来会被弃用，请使用顶级选项替代。
    */
   experimental?: {
     /**
@@ -147,11 +235,99 @@ export default defineConfig({
      * 由于根目录(vite.config.js内配置的root选项)无法自动获取入口名称，默认使用_root作为其module名，你也可以通过这个配置项来自定义。
      */
     rootEntryDistName?: string
+    /**
+     * @deprecated 请使用顶级 `enableDevDirectory` 选项替代。
+     */
+    enableDevDirectory?: boolean
+    /**
+     * @deprecated 请使用顶级 `historyApiFallback` 选项替代。
+     */
+    historyApiFallback?: boolean
   }
 }
 ```
 
-## 每个入口页面的单独配置选项
+### 自定义模板引擎
+
+Handlebars 是稳定的默认模板引擎。你可以通过实现 `TemplateEngine` 接口来提供自定义模板引擎；提供 `templateEngine` 后，它会覆盖内置 Handlebars 引擎，并忽略所有 `handlebars`、`renderEngineOption`、`handlebarsHelpers` 和 `handlebarsPartials` 选项。
+
+```typescript
+import autoMpaHtmlPlugin from 'vite-plugin-auto-mpa-html'
+import type { TemplateEngine } from 'vite-plugin-auto-mpa-html'
+
+// 示例：使用 EJS 作为自定义引擎
+import ejs from 'ejs'
+
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  templateEngine: {
+    render: async (templateStr, data, context) => {
+      return ejs.render(templateStr, {
+        ...data,
+        templatePath: context?.templatePath,
+      }, { async: true })
+    }
+  }
+})
+```
+
+第三个 `context` 参数包含当前入口、页面配置、已合并的插件选项和模板路径：
+
+```typescript
+import type { TemplateEngine } from 'vite-plugin-auto-mpa-html'
+
+const templateEngine: TemplateEngine = {
+  async render(templateStr, data, context) {
+    console.log(context?.entry.value)
+    console.log(context?.pageConfig.template)
+    console.log(context?.templatePath)
+    return templateStr
+  }
+}
+```
+
+### Handlebars Helpers 与 Partials
+
+推荐通过新的 `handlebars` 选项对象注册 helper、partial 和渲染选项：
+
+```typescript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  handlebars: {
+    compileOptions: {
+      noEscape: false,
+    },
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: false,
+    },
+    helpers: {
+      eq: (a, b) => a === b,
+      formatDate: (date) => new Date(date).toLocaleDateString(),
+      upper: (str) => String(str).toUpperCase(),
+    },
+    partials: {
+      header: '<header><h1>{{title}}</h1></header>',
+      footer: '<footer>{{copyright}}</footer>',
+    },
+  },
+  sharedData: {
+    copyright: '2024 My Company'
+  }
+})
+```
+
+在模板中使用：
+
+```html
+{{> header}}
+<main>{{#if (eq page "home")}}Welcome!{{/if}}</main>
+<p>Published: {{formatDate publishDate}}</p>
+{{> footer}}
+```
+
+旧的 `renderEngineOption`、`handlebarsHelpers` 和 `handlebarsPartials` 仍然兼容。新项目建议使用 `handlebars`；当新旧选项同时存在时，`handlebars` 中的值优先生效。
+
+## 页面配置选项
 
 这个文件是放置在每个入口目录的`config.json`
 
@@ -159,9 +335,9 @@ export default defineConfig({
 {
   /**
    * 本页应用模板的*相对*路径
-   * @required
+   * @optional 如果不提供，将使用默认模板
    */
-  template: string
+  template?: string
   /**
    * 本页Handlebars模板使用的渲染数据，会与顶层配置的sharedData进行合并
    * @default {}
@@ -204,6 +380,30 @@ export default pageConfigGenerator((opt) => {
 /** @type {import('vite-plugin-auto-mpa-html').PageConfigGeneratorTypeExport} */
 /** @param {import('vite-plugin-auto-mpa-html').PageConfigOption} opt  */
 ```
+
+## URL 匹配行为
+
+插件支持不带 `.html` 后缀的 URL 自动匹配：
+
+| URL 模式 | 普通模式 | 实验模式 (`.html`) |
+|----------|---------|-------------------|
+| `/subdir` | 返回 `subdir/index.html` | 返回 `subdir.html` |
+| `/subdir/nested` | 返回 `subdir/nested/index.html` | 返回 `subdir/nested.html` |
+| `/subdir/page` (不存在) | 当 `historyApiFallback: true` 时回退到 `subdir/index.html` | 当 `historyApiFallback: true` 时回退到 `subdir.html` |
+| `/nonexistent` | 透传 (next()) | 透传 (next()) |
+
+## History API Fallback
+
+当启用 `historyApiFallback` 时，插件会自动将不匹配任何入口的路径回退到最近的父级入口 HTML。这对于使用客户端路由的 SPA 应用非常有用（如 React Router、Vue Router）。
+
+```javascript
+autoMpaHtmlPlugin({
+  entryName: "main.tsx",
+  historyApiFallback: true
+})
+```
+
+例如，如果你在 `/subdir` 有一个入口，访问 `/subdir/any/nested/path` 将返回 `subdir/index.html`（或实验模式下的 `subdir.html`）的渲染结果。
 
 ## 局限
 

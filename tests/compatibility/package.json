@@ -1,0 +1,5 @@
+{
+  "name": "vite-plugin-auto-mpa-html-compatibility",
+  "private": true,
+  "type": "module"
+}

@@ -1,3 +1,44 @@
+## [1.4.0-rc.2] - 2026-07-30
+
+### Bug Fixes
+
+* resolve flattened `.html` virtual entries beside their page directory so injected entry scripts do not contain a duplicated page path.
+
+## [1.4.0-rc.1] - 2026-07-29
+
+### Features
+
+* add an opt-in page-oriented production output layout with configurable shared asset directory.
+* keep page-owned chunks and source assets beside their HTML page while centralizing ambiguous and shared files without duplication.
+
+## [1.4.0-rc.0] - 2026-07-28
+
+### Features
+
+* declare support for Vite 4.2 through Vite 8 on Node.js 20.19+ or 22.12+.
+* add packed-package compatibility smoke tests for production builds and the development server across supported Vite majors.
+* update the entry discovery dependency to the maintained `glob` 13 release.
+
+### Bug Fixes
+
+* use the CommonJS bundle as the legacy `main` entry.
+* avoid warning about experimental features when no experimental option is configured.
+* replace implementation-detail peer dependencies with the supported Vite peer range.
+
+## [1.4.0-alpha.0] - 2026-06-24
+
+### Features
+
+* document Handlebars as the stable default template engine and add the preferred `handlebars` option object for compile options, runtime options, helpers, and partials.
+* allow custom template engines to return `Promise<string>` and receive `TemplateRenderContext`.
+
+### Bug Fixes
+
+* isolate helpers and partials per `HandlebarsEngine` instance instead of registering them globally.
+* clarify that custom `templateEngine` overrides built-in Handlebars options while keeping `renderEngineOption`, `handlebarsHelpers`, and `handlebarsPartials` backward compatible.
+* migrate npm release CI to Trusted Publishing with OIDC and update outdated GitHub Actions configuration.
+* upgrade vulnerable development dependencies reported by Dependabot.
+
 ## [1.3.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.3.0...v1.3.1) (2024-11-27)
 
 
@@ -362,6 +403,3 @@
 ### Features
 
 * add commitlint & changelog ([6090742](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/commit/60907428568e848c8d3f7e5101855035d076072f))
-
-
-
