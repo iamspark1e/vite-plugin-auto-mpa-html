@@ -1,9 +1,7 @@
 import path from 'path'
-import chokidar from 'chokidar'
 import type { ViteDevServer } from 'vite'
 import type { EntryPath } from './core.js'
 import type { MergedPluginOption, ColoringConsole } from './types.js'
-import type { FSWatcher } from 'chokidar'
 import { resolveEntryTemplatePath } from './template.js'
 
 export interface ConfigWatcher {
@@ -17,7 +15,6 @@ export function createConfigWatcher(
     _console: ColoringConsole
 ): ConfigWatcher {
     let debounceTimer: ReturnType<typeof setTimeout> | null = null
-    let watcher: FSWatcher | null = null
 
     // Collect all config and template files to watch
     const filesToWatch: string[] = []
@@ -44,6 +41,7 @@ export function createConfigWatcher(
     }
 
     _console.log(`[Config Watcher] Watching ${uniqueFiles.length} files for changes`)
+    const watchedFiles = new Set(uniqueFiles.map(filePath => path.resolve(filePath)))
 
     // Create debounced reload function
     const triggerReload = (filePath: string) => {
@@ -64,34 +62,20 @@ export function createConfigWatcher(
         }, 300) // 300ms debounce
     }
 
-    // Create chokidar watcher
-    watcher = chokidar.watch(uniqueFiles, {
-        persistent: true,
-        ignoreInitial: true,
-        awaitWriteFinish: {
-            stabilityThreshold: 100,
-            pollInterval: 50
-        }
-    })
-
-    watcher.on('change', (filePath: string) => {
-        triggerReload(filePath)
-    })
-
-    watcher.on('add', (filePath: string) => {
-        triggerReload(filePath)
-    })
-
-    watcher.on('unlink', (filePath: string) => {
+    const onChange = (filePath: string) => {
+        if (watchedFiles.has(path.resolve(filePath))) triggerReload(filePath)
+    }
+    const onUnlink = (filePath: string) => {
+        if (!watchedFiles.has(path.resolve(filePath))) return
         const relativePath = path.relative(server.config.root, filePath)
         _console.warn(`[Config Watcher] File deleted: ${relativePath}`)
         triggerReload(filePath)
-    })
+    }
 
-    watcher.on('error', (error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error)
-        _console.error(`[Config Watcher] Error: ${message}`)
-    })
+    server.watcher.add(uniqueFiles)
+    server.watcher.on('change', onChange)
+    server.watcher.on('add', onChange)
+    server.watcher.on('unlink', onUnlink)
 
     return {
         stop: () => {
@@ -99,11 +83,10 @@ export function createConfigWatcher(
                 clearTimeout(debounceTimer)
                 debounceTimer = null
             }
-            if (watcher) {
-                watcher.close()
-                watcher = null
-                _console.log('[Config Watcher] Stopped watching files')
-            }
+            server.watcher.off('change', onChange)
+            server.watcher.off('add', onChange)
+            server.watcher.off('unlink', onUnlink)
+            _console.log('[Config Watcher] Stopped watching files')
         }
     }
 }

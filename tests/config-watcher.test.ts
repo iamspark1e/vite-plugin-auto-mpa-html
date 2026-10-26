@@ -9,13 +9,19 @@ import fs from 'fs'
 
 // Mock ViteDevServer
 const mockWsSend = vi.fn()
+const mockWatcher = {
+  add: vi.fn(),
+  on: vi.fn(),
+  off: vi.fn()
+}
 const mockServer = {
   config: {
     root: '/tmp/test-root'
   },
   ws: {
     send: mockWsSend
-  }
+  },
+  watcher: mockWatcher
 } as unknown as ViteDevServer
 
 // Mock ColoringConsole
@@ -79,6 +85,10 @@ describe('Config Watcher', () => {
 
   it('should log watched files count', () => {
     const watcher = createConfigWatcher(testEntries, defaultOptions, mockServer, mockConsole)
+    expect(mockWatcher.add).toHaveBeenCalledWith(expect.arrayContaining([
+      '/tmp/test-root/config.json',
+      '/tmp/test-root/subdir/config.json'
+    ]))
     expect(mockConsole.log).toHaveBeenCalledWith(
       expect.stringContaining('Watching')
     )
@@ -96,6 +106,7 @@ describe('Config Watcher', () => {
   it('should stop watcher correctly', () => {
     const watcher = createConfigWatcher(testEntries, defaultOptions, mockServer, mockConsole)
     watcher.stop()
+    expect(mockWatcher.off).toHaveBeenCalledTimes(3)
     expect(mockConsole.log).toHaveBeenCalledWith(
       expect.stringContaining('Stopped watching files')
     )

@@ -83,7 +83,7 @@ export async function fetchTemplateHTML(
  * @param dest {string} Output dir
  */
 export async function prepareSingleVirtualEntry(entry: EntryPath, pluginOption: MergedPluginOption) {
-    let pageData: PagePluginConfig = {}
+    let pageData: PagePluginConfig
     const configPath = path.join(entry.abs, entry.__options.configName);
     if (!existsSync(configPath)) {
         _console.fatal(`Page entry: ${entry.value}, its config (${entry.__options.configName}) cannot be found, please check!`)
