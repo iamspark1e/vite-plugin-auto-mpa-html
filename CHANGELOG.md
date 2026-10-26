@@ -1,3 +1,4 @@
+## [1.4.1](https://github.com/iamspark1e/vite-plugin-auto-mpa-html/compare/v1.4.0...v1.4.1) (2026-10-26)
 ## [1.4.0-rc.2] - 2026-07-30
 
 ### Bug Fixes
