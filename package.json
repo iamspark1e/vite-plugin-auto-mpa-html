@@ -53,7 +53,7 @@
     "eslint": "^10.13.0",
     "prettier": "^3.9.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.3.1",
     "supertest": "^7.3.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
